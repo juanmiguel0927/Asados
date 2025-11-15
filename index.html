@@ -150,6 +150,50 @@
             border-color: #d97706;
             box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
         }
+        /* ! INICIO: Nuevos Estilos (Orden, Favoritos, Tips) */
+        #sort-select {
+            padding: 10px 16px;
+            border: 2px solid #e0d9c4;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #4a2d1f;
+            background-color: #fffbf0;
+            width: 100%;
+        }
+        #sort-select:focus {
+            outline: none;
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.75rem; /* 28px */
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+            color: rgba(255, 255, 255, 0.7); /* Blanco semitransparente */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+        .favorite-btn:hover {
+            transform: scale(1.15);
+        }
+        .favorite-btn.active {
+            color: #ef4444; /* Rojo */
+            transform: scale(1.1);
+        }
+        .recipe-card-image-container {
+            position: relative;
+        }
+        #modal-tips-content {
+            background-color: #fffbf0;
+            border-left: 4px solid #d97706;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        /* ! FIN: Nuevos Estilos */
         .card-details {
             display: flex;
             justify-content: space-between;
@@ -350,14 +394,33 @@
                 <!-- ! INICIO: Controles de Búsqueda y Filtro -->
                 <div class="mb-8 space-y-4">
                     <!-- Barra de Búsqueda -->
-                    <div>
-                        <label for="search-bar" class="block text-sm font-semibold mb-2">Buscar Receta:</label>
-                        <input type="text" id="search-bar" placeholder="Ej: Costillar, Brisket, Papas...">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="search-bar" class="block text-sm font-semibold mb-2">Buscar Receta:</label>
+                            <input type="text" id="search-bar" placeholder="Ej: Costillar, Brisket, Papas...">
+                        </div>
+                        <!-- ! INICIO: Opciones de Ordenar -->
+                        <div>
+                            <label for="sort-select" class="block text-sm font-semibold mb-2">Ordenar por:</label>
+                            <select id="sort-select">
+                                <option value="default">Relevancia</option>
+                                <option value="time-asc">Tiempo (más rápido primero)</option>
+                                <option value="time-desc">Tiempo (más lento primero)</option>
+                                <option value="difficulty-asc">Dificultad (más fácil primero)</option>
+                                <option value="difficulty-desc">Dificultad (más difícil primero)</option>
+                                <option value="name-asc">Nombre (A-Z)</option>
+                                <option value="name-desc">Nombre (Z-A)</option>
+                            </select>
+                        </div>
+                        <!-- ! FIN: Opciones de Ordenar -->
                     </div>
                     
                     <!-- Contenedor de Filtros -->
                     <div id="filter-container" class="flex flex-wrap gap-2">
                         <button class="filter-button active" data-filter="todos">Ver Todo</button>
+                        <!-- ! INICIO: Botón de Favoritos -->
+                        <button class="filter-button" data-filter="favoritos">❤️ Favoritos</button>
+                        <!-- ! FIN: Botón de Favoritos -->
                         <button class="filter-button" data-filter="cerdo">🐖 Cerdo</button>
                         <button class="filter-button" data-filter="res">🐄 Res</button>
                         <button class="filter-button" data-filter="pollo">🐓 Pollo</button>
@@ -406,6 +469,12 @@
                 <div id="modal-body" class="space-y-4 text-base">
                     <!-- El contenido de la receta se inyectará aquí -->
                 </div>
+                <!-- ! INICIO: Contenedor de Tips -->
+                <div id="modal-tips-content" class="hidden">
+                    <h3 class="font-bold text-xl mb-3 text-amber-800">💡 Consejos del Asador</h3>
+                    <p id="modal-tips-text" class="text-base"></p>
+                </div>
+                <!-- ! FIN: Contenedor de Tips -->
             </div>
             <!-- ! Botón de Imprimir -->
             <button id="modal-print-btn">Imprimir Receta</button>
@@ -416,6 +485,7 @@
     <!-- ! INICIO: Base de datos de recetas en JSON y Lógica de la App -->
     <script>
         // --- INICIO: Base de Datos de Recetas (JSON) ---
+        // ! SE HAN AÑADIDO: timeMinutes, difficultyValue, y tips
         const recipeData = [
             // --- PLATOS PRINCIPALES ---
             {
@@ -424,7 +494,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo',
                 time: '3-4 horas',
+                timeMinutes: 210, // 3.5 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -450,7 +522,8 @@
                         <li>Verifica que la temperatura interna alcance los 71°C.</li>
                         <li>Retira, deja reposar 15 minutos y corta.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para una costra más sabrosa, puedes rociar el costillar con jugo de manzana cada 45 minutos durante la cocción.'
             },
             {
                 id: 'receta-brisket',
@@ -458,7 +531,9 @@
                 category: 'res',
                 image: 'https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res',
                 time: '10-12 horas',
+                timeMinutes: 660, // 11 * 60
                 difficulty: 'Difícil',
+                difficultyValue: 3,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -483,7 +558,8 @@
                         <li>Verifica que la temperatura interna alcance los 88-93°C.</li>
                         <li>Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar.</li>
                     </ol>
-                `
+                `,
+                tips: 'La paciencia es clave. No subas el fuego. Para atravesar el "estancamiento" (stall) alrededor de los 70°C, puedes envolver el brisket en papel de estraza (butcher paper).'
             },
             {
                 id: 'receta-pollo-citricos',
@@ -491,7 +567,9 @@
                 category: 'pollo',
                 image: 'https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado',
                 time: '1.5-2 horas',
+                timeMinutes: 105, // 1.75 * 60
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -517,7 +595,8 @@
                         <li>Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.</li>
                         <li>Retira y deja reposar 10 minutos antes de cortar.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para una piel extra crujiente, seca muy bien el pollo con papel de cocina antes de marinarlo (especialmente si el marinado no es a base de aceite).'
             },
             {
                 id: 'receta-cordero-menta',
@@ -525,7 +604,9 @@
                 category: 'cordero',
                 image: 'https://placehold.co/400x200/8c7a6b/ffffff?text=Costillas+de+Cordero',
                 time: '20-30 min',
+                timeMinutes: 25,
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -552,7 +633,8 @@
                         <li>Verifica que la temperatura interna alcance los 63-71°C (punto medio).</li>
                         <li>Sirve con más salsa por encima.</li>
                     </ol>
-                `
+                `,
+                tips: 'El cordero se cocina rápido. No lo cocines en exceso. El punto medio (rosa por dentro) es ideal para mantener su jugosidad.'
             },
             {
                 id: 'receta-pavo-arce',
@@ -560,7 +642,9 @@
                 category: 'pavo',
                 image: 'https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo',
                 time: '2-3 horas',
+                timeMinutes: 150, // 2.5 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -586,7 +670,8 @@
                         <li>Verifica que la temperatura interna alcance los 74-79°C.</li>
                         <li>Retira, deja reposar 10 minutos y rebana.</li>
                     </ol>
-                `
+                `,
+                tips: 'El pavo tiende a secarse. Usar un marinado o salmuera antes de glasear puede ayudar a mantenerlo jugoso. No cocines de más.'
             },
             {
                 id: 'receta-costillas-miel-mostaza',
@@ -594,7 +679,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza',
                 time: '2-3 horas',
+                timeMinutes: 150, // 2.5 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -617,7 +704,8 @@
                         <li>Verifica que la temperatura interna alcance los 71°C.</li>
                         <li>Retira, corta y sirve con más glaseado.</li>
                     </ol>
-                `
+                `,
+                tips: 'Aplica el glaseado (que contiene azúcar/miel) solo durante los últimos 30-45 minutos de cocción para evitar que se queme.'
             },
             {
                 id: 'receta-costillas-coreanas',
@@ -625,7 +713,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas',
                 time: '1.5-2 horas',
+                timeMinutes: 105, // 1.75 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -649,7 +739,8 @@
                         <li>Verifica que la temperatura interna alcance los 71°C.</li>
                         <li>Retira, espolvorea con semillas de sésamo y sirve.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para un sabor más intenso, ralla un poco de pera asiática en el marinado. Las enzimas de la pera ayudan a ablandar la carne.'
             },
             {
                 id: 'receta-costillas-ciruela',
@@ -657,7 +748,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela',
                 time: '2-2.5 horas',
+                timeMinutes: 135, // 2.25 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -679,7 +772,8 @@
                         <li>Verifica que la temperatura interna alcance los 71°C.</li>
                         <li>Retira, corta y sirve con más salsa.</li>
                     </ol>
-                `
+                `,
+                tips: 'La salsa de ciruela (a menudo usada en cocina asiática) puede ser espesa. Puedes aligerarla con un chorrito de vinagre de arroz.'
             },
             {
                 id: 'receta-chicharron-crujiente',
@@ -687,7 +781,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente',
                 time: '1-2 horas',
+                timeMinutes: 90, // 1.5 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -709,7 +805,8 @@
                         <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
                         <li>Escurre el exceso de aceite y sirve caliente.</li>
                     </ol>
-                `
+                `,
+                tips: 'El secreto del chicharrón es que la piel esté MUY seca. Déjala secar en la nevera sin tapar durante unas horas antes de cocinarla.'
             },
             {
                 id: 'receta-chicharron-limon',
@@ -717,7 +814,9 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile',
                 time: '1-2 horas',
+                timeMinutes: 90, // 1.5 * 60
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -741,7 +840,8 @@
                         <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
                         <li>Escurre el exceso de aceite y sirve caliente con rodajas de limón.</li>
                     </ol>
-                `
+                `,
+                tips: 'No añadas la ralladura de limón hasta el final (después de freír) para un sabor a limón más fresco, ya que puede quemarse.'
             },
             {
                 id: 'receta-pescado-limon',
@@ -749,7 +849,9 @@
                 category: 'pescado',
                 image: 'https://placehold.co/400x200/bde0fe/4a2d1f?text=Pescado+al+Barril',
                 time: '15-20 min',
+                timeMinutes: 18,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -769,7 +871,8 @@
                         <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
                         <li>Sirve con un poco de la salsa por encima.</li>
                     </ol>
-                `
+                `,
+                tips: 'El pescado se cocina muy rápido. Estará listo cuando se desmenuce fácilmente con un tenedor. No lo dejes ni un minuto de más.'
             },
             {
                 id: 'receta-pescado-mantequilla',
@@ -777,7 +880,9 @@
                 category: 'pescado',
                 image: 'https://placehold.co/400x200/cddfa0/4a2d1f?text=Pescado+con+Mantequilla',
                 time: '15-20 min',
+                timeMinutes: 18,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -797,7 +902,8 @@
                         <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
                         <li>Sirve con un poco de la salsa por encima.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para salmón, considera cocinarlo sobre una tabla de cedro (remojada previamente) en la parrilla para un sabor ahumado extra.'
             },
 
             // --- ACOMPAÑAMIENTOS ---
@@ -807,7 +913,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/f0e6d2/4a2d1f?text=Puré+de+Papas+Ahumado',
                 time: '45 min',
+                timeMinutes: 45,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -823,7 +931,8 @@
                         <li>Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.</li>
                         <li>Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave.</li>
                     </ol>
-                `
+                `,
+                tips: 'Usa una madera de sabor suave como manzano o cerezo para ahumar las papas. Maderas fuertes como el mezquite pueden ser demasiado intensas.'
             },
             {
                 id: 'receta-ensalada-col',
@@ -831,7 +940,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/55a630/ffffff?text=Ensalada+de+Col+Rizada',
                 time: '10 min',
+                timeMinutes: 10,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -854,7 +965,8 @@
                         <li>En otro tazón, mezcla los ingredientes de la vinagreta.</li>
                         <li>Vierte la vinagreta sobre la ensalada y mezcla bien.</li>
                     </ol>
-                `
+                `,
+                tips: 'La col rizada (kale) puede ser dura. "Masajea" la col con la vinagreta usando tus manos durante 1-2 minutos para ablandar las hojas.'
             },
             {
                 id: 'receta-salsa-bbq',
@@ -862,7 +974,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/8f250c/ffffff?text=Salsa+Barbacoa',
                 time: '15 min',
+                timeMinutes: 15,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -882,7 +996,8 @@
                         <li>Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.</li>
                         <li>Deja enfriar antes de usar.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para una salsa más compleja, añade 1/4 de taza de bourbon o ron oscuro durante la cocción.'
             },
             {
                 id: 'receta-maiz-parrilla',
@@ -890,7 +1005,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/fde047/4a2d1f?text=Maíz+a+la+Parrilla',
                 time: '20 min',
+                timeMinutes: 20,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -908,7 +1025,8 @@
                         <li>Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.</li>
                         <li>Cepilla el maíz con la mantequilla de hierbas antes de servir.</li>
                     </ol>
-                `
+                `,
+                tips: 'No quites todas las hojas del maíz. Tira de ellas hacia atrás, quita los pelos, unta el maíz con mantequilla de hierbas y vuelve a cerrar las hojas. Asa el maíz envuelto en sus propias hojas.'
             },
             {
                 id: 'receta-esparragos',
@@ -916,7 +1034,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/84cc16/ffffff?text=Espárragos',
                 time: '10 min',
+                timeMinutes: 10,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -934,7 +1054,8 @@
                         <li>Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.</li>
                         <li>Sirve con más ralladura de limón y parmesano.</li>
                     </ol>
-                `
+                `,
+                tips: 'Añade el queso parmesano solo en el último minuto de cocción, o se quemará y amargará.'
             },
             {
                 id: 'receta-ensalada-tomate',
@@ -942,7 +1063,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/ef4444/ffffff?text=Ensalada+Tomate+Mozzarella',
                 time: '5 min',
+                timeMinutes: 5,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -960,7 +1083,8 @@
                         <li>Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.</li>
                         <li>Deja reposar unos minutos antes de servir.</li>
                     </ol>
-                `
+                `,
+                tips: 'Usa tomates de buena calidad y a temperatura ambiente, nunca fríos de la nevera. Sazona los tomates con sal *antes* de añadir la mozzarella.'
             },
             {
                 id: 'receta-papas-hasselback',
@@ -968,7 +1092,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/f5cb5c/4a2d1f?text=Papas+Hasselback',
                 time: '1 hora',
+                timeMinutes: 60,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -987,7 +1113,8 @@
                         <li>Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.</li>
                         <li>Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para cortar las papas fácilmente sin llegar al fondo, colócalas entre dos palillos chinos o mangos de cucharas de madera.'
             },
             {
                 id: 'receta-yuca-frita',
@@ -995,7 +1122,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/ffe8d6/4a2d1f?text=Yuca+Frita+con+Mojo',
                 time: '45 min',
+                timeMinutes: 45,
                 difficulty: 'Media',
+                difficultyValue: 2,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -1020,7 +1149,8 @@
                         <li>Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.</li>
                         <li>Sirve la yuca caliente con el mojo.</li>
                     </ol>
-                `
+                `,
+                tips: 'Para una yuca extra crujiente, congela las tiras de yuca *después* de hervirlas y enfriarlas. Fríelas directamente desde congeladas.'
             },
             {
                 id: 'receta-pure-yuca',
@@ -1028,7 +1158,9 @@
                 category: 'acompanamiento',
                 image: 'https://placehold.co/400x200/fff4e6/4a2d1f?text=Puré+de+Yuca',
                 time: '30 min',
+                timeMinutes: 30,
                 difficulty: 'Fácil',
+                difficultyValue: 1,
                 content: `
                     <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
                     <ul class="list-disc pl-5 mb-4">
@@ -1045,7 +1177,8 @@
                         <li>Usa un machacador o procesador para hacer un puré suave.</li>
                         <li>Sazona con sal y pimienta. Sirve caliente.</li>
                     </ol>
-                `
+                `,
+                tips: 'Asegúrate de quitar la hebra central (fibrosa) de la yuca después de hervirla y antes de hacer el puré.'
             }
         ];
         // --- FIN: Base de Datos de Recetas (JSON) ---
@@ -1065,6 +1198,10 @@
             const modalTitle = document.getElementById('modal-title');
             const modalBody = document.getElementById('modal-body');
             const modalPrintBtn = document.getElementById('modal-print-btn');
+            // ! INICIO: Nuevas variables de Modal (Tips)
+            const modalTipsContent = document.getElementById('modal-tips-content');
+            const modalTipsText = document.getElementById('modal-tips-text');
+            // ! FIN: Nuevas variables de Modal (Tips)
 
             // Variables de Recetas (se llenarán dinámicamente)
             let allRecipeCards = []; // Se llenará después de generar las tarjetas
@@ -1074,9 +1211,16 @@
             // Variables de Filtro/Búsqueda
             const filterContainer = document.getElementById('filter-container');
             const searchBar = document.getElementById('search-bar');
+            // ! INICIO: Nueva variable (Sort)
+            const sortSelect = document.getElementById('sort-select');
+            // ! FIN: Nueva variable (Sort)
             const headerPrincipales = document.getElementById('header-principales');
             const headerAcompanamientos = document.getElementById('header-acompanamientos');
             const noResults = document.getElementById('no-results');
+
+            // ! INICIO: Variables de Favoritos
+            let favorites = getFavorites();
+            // ! FIN: Variables de Favoritos
 
             // Mapa de iconos
             const iconMap = {
@@ -1118,18 +1262,34 @@
                 });
             });
 
-            // --- ! INICIO: Generación Dinámica de Recetas ---
+            // --- ! INICIO: Generación Dinámica de Recetas (Actualizada) ---
             function generateRecipeCards() {
                 if (!gridPrincipales || !gridAcompanamientos) return;
+
+                // ! Actualizar favoritos desde localStorage al inicio
+                favorites = getFavorites();
 
                 let gridPrincipalesHTML = '';
                 let gridAcompanamientosHTML = '';
 
                 recipeData.forEach(recipe => {
                     const icon = iconMap[recipe.category] || '🍽️';
+                    // ! Comprobar si es favorito
+                    const isFavorite = favorites.includes(recipe.id);
+                    
                     const cardHTML = `
-                        <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="${recipe.id}" data-category="${recipe.category}">
-                            <img src="${recipe.image}" alt="${recipe.title}" class="w-full h-40 object-cover">
+                        <div class="recipe-card rounded-lg shadow-md overflow-hidden" 
+                             data-recipe-id="${recipe.id}" 
+                             data-category="${recipe.category}"
+                             data-time-minutes="${recipe.timeMinutes}"
+                             data-difficulty-value="${recipe.difficultyValue}"
+                             data-title="${recipe.title.toLowerCase()}"
+                        >
+                            <div class="recipe-card-image-container">
+                                <img src="${recipe.image}" alt="${recipe.title}" class="w-full h-40 object-cover">
+                                <!-- ! Botón de Favorito -->
+                                <span class="favorite-btn ${isFavorite ? 'active' : ''}" data-fav-id="${recipe.id}">❤️</span>
+                            </div>
                             <div class="p-4">
                                 <h3 class="text-lg font-bold">${icon} ${recipe.title}</h3>
                             </div>
@@ -1155,9 +1315,20 @@
                 
                 // Añadir listeners a las nuevas tarjetas
                 allRecipeCards.forEach(card => {
-                    card.addEventListener('click', () => {
+                    // Listener para abrir el modal (en la tarjeta)
+                    card.addEventListener('click', (e) => {
+                        // Solo abrir modal si no se hizo clic en el botón de favorito
+                        if (e.target.closest('.favorite-btn')) return;
                         const recipeId = card.dataset.recipeId;
                         openModal(recipeId);
+                    });
+                });
+
+                // ! Añadir listeners a los botones de favorito
+                document.querySelectorAll('.favorite-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Evitar que se abra el modal
+                        toggleFavorite(e.target);
                     });
                 });
             }
@@ -1171,6 +1342,15 @@
                 if (recipe && modalTitle && modalBody && modal) {
                     modalTitle.textContent = recipe.title;
                     modalBody.innerHTML = recipe.content;
+                    
+                    // ! Lógica de Tips
+                    if (recipe.tips && modalTipsContent && modalTipsText) {
+                        modalTipsText.textContent = recipe.tips;
+                        modalTipsContent.classList.remove('hidden');
+                    } else {
+                        modalTipsContent.classList.add('hidden');
+                    }
+
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
                 }
@@ -1189,41 +1369,81 @@
             // --- ! FIN: Funcionalidad del Modal de Recetas ---
 
 
-            // --- ! INICIO: Funcionalidad de Filtro y Búsqueda combinada ---
+            // --- ! INICIO: Funcionalidad de Filtro y Búsqueda combinada (Actualizada) ---
             function updateRecipeView() {
-                if (!filterContainer || !searchBar || !allRecipeCards.length) return;
+                if (!filterContainer || !searchBar || !allRecipeCards.length || !sortSelect) return;
 
                 const activeFilter = filterContainer.querySelector('.filter-button.active').dataset.filter;
                 const searchTerm = searchBar.value.toLowerCase();
-                let mainVisibleCount = 0;
-                let accompVisibleCount = 0;
+                const sortValue = sortSelect.value;
+                
+                let mainVisibleCards = [];
+                let accompVisibleCards = [];
 
                 allRecipeCards.forEach(card => {
                     const category = card.dataset.category;
-                    const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                    const title = card.dataset.title;
+                    const recipeId = card.dataset.recipeId;
                     
-                    const matchesFilter = (activeFilter === 'todos') || (activeFilter === category);
+                    // ! Lógica de Filtro (con Favoritos)
+                    const isFavorite = favorites.includes(recipeId);
+                    const matchesFilter = (activeFilter === 'todos') || 
+                                          (activeFilter === category) || 
+                                          (activeFilter === 'favoritos' && isFavorite);
                     const matchesSearch = title.includes(searchTerm);
 
                     if (matchesFilter && matchesSearch) {
                         card.style.display = 'block';
                         if (category === 'acompanamiento') {
-                            accompVisibleCount++;
+                            accompVisibleCards.push(card);
                         } else {
-                            mainVisibleCount++;
+                            mainVisibleCards.push(card);
                         }
                     } else {
                         card.style.display = 'none';
                     }
                 });
 
+                // ! Lógica de Ordenamiento
+                const sortFunction = (a, b) => {
+                    const valA = a.dataset;
+                    const valB = b.dataset;
+
+                    switch (sortValue) {
+                        case 'time-asc':
+                            return parseFloat(valA.timeMinutes) - parseFloat(valB.timeMinutes);
+                        case 'time-desc':
+                            return parseFloat(valB.timeMinutes) - parseFloat(valA.timeMinutes);
+                        case 'difficulty-asc':
+                            return parseFloat(valA.difficultyValue) - parseFloat(valB.difficultyValue);
+                        case 'difficulty-desc':
+                            return parseFloat(valB.difficultyValue) - parseFloat(valA.difficultyValue);
+                        case 'name-asc':
+                            return valA.title.localeCompare(valB.title);
+                        case 'name-desc':
+                            return valB.title.localeCompare(valA.title);
+                        case 'default':
+                        default:
+                            return 0; // Mantener el orden del DOM
+                    }
+                };
+                
+                if (sortValue !== 'default') {
+                    mainVisibleCards.sort(sortFunction);
+                    accompVisibleCards.sort(sortFunction);
+                }
+
+                // ! Re-apendar al DOM en el orden correcto
+                mainVisibleCards.forEach(card => gridPrincipales.appendChild(card));
+                accompVisibleCards.forEach(card => gridAcompanamientos.appendChild(card));
+
                 // Actualizar visibilidad de cabeceras
-                if (headerPrincipales) headerPrincipales.style.display = (mainVisibleCount > 0) ? 'block' : 'none';
-                if (headerAcompanamientos) headerAcompanamientos.style.display = (accompVisibleCount > 0) ? 'block' : 'none';
+                if (headerPrincipales) headerPrincipales.style.display = (mainVisibleCards.length > 0) ? 'block' : 'none';
+                if (headerAcompanamientos) headerAcompanamientos.style.display = (accompVisibleCards.length > 0) ? 'block' : 'none';
 
                 // Mostrar mensaje de no resultados
                 if (noResults) {
-                    noResults.style.display = (mainVisibleCount === 0 && accompVisibleCount === 0) ? 'block' : 'none';
+                    noResults.style.display = (mainVisibleCards.length === 0 && accompVisibleCards.length === 0) ? 'block' : 'none';
                 }
             }
 
@@ -1238,12 +1458,49 @@
                 });
             }
             if (searchBar) searchBar.addEventListener('keyup', updateRecipeView);
+            // ! Listener para Ordenar
+            if (sortSelect) sortSelect.addEventListener('change', updateRecipeView);
             // --- ! FIN: Funcionalidad de Filtro y Búsqueda ---
+            
+
+            // --- ! INICIO: Funciones de Favoritos (Nuevas) ---
+            function getFavorites() {
+                const favs = localStorage.getItem('asadosBarrilFavorites');
+                return favs ? JSON.parse(favs) : [];
+            }
+
+            function saveFavorites(favs) {
+                localStorage.setItem('asadosBarrilFavorites', JSON.stringify(favs));
+            }
+
+            function toggleFavorite(btnElement) {
+                const recipeId = btnElement.dataset.favId;
+                const index = favorites.indexOf(recipeId);
+
+                if (index > -1) {
+                    // Ya es favorito, quitar
+                    favorites.splice(index, 1);
+                    btnElement.classList.remove('active');
+                } else {
+                    // No es favorito, añadir
+                    favorites.push(recipeId);
+                    btnElement.classList.add('active');
+                }
+                saveFavorites(favorites);
+
+                // Si estamos en la vista de favoritos, actualizar la vista
+                const activeFilter = filterContainer.querySelector('.filter-button.active').dataset.filter;
+                if (activeFilter === 'favoritos') {
+                    updateRecipeView();
+                }
+            }
+            // --- ! FIN: Funciones de Favoritos ---
 
 
             // --- ! INICIO: Funcionalidad de Imprimir ---
             function handlePrint() {
                 const title = modalTitle.textContent;
+                // ! Actualizado para incluir los Tips
                 const content = document.getElementById('modal-body-printable').innerHTML;
                 
                 const printWindow = window.open('', '_blank');
@@ -1251,10 +1508,19 @@
                 // Estilos simples para impresión
                 printWindow.document.write(`
                     <style>
-                        body { font-family: 'Inter', sans-serif; line-height: 1.6; }
+                        body { font-family: 'Inter', sans-serif; line-height: 1.6; margin: 2rem; }
                         h1 { color: #d97706; }
                         h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
                         ul, ol { padding-left: 20px; }
+                        /* Ocultar elementos no deseados en impresión */
+                        #modal-tips-content.hidden { display: none; }
+                        #modal-tips-content {
+                            background-color: #fafaf8;
+                            border-left: 4px solid #d97706;
+                            padding: 16px;
+                            border-radius: 8px;
+                            margin-top: 16px;
+                        }
                     </style>
                 `);
                 printWindow.document.write('</head><body>');
