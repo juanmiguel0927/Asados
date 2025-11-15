@@ -112,6 +112,27 @@
         ol {
             list-style-type: decimal;
         }
+        /* ! INICIO: Estilos para Filtros */
+        .filter-button {
+            background-color: #f3f4f6;
+            color: #4a2d1f;
+            padding: 8px 16px;
+            border-radius: 99px;
+            border: 1px solid #e0d9c4;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .filter-button:hover {
+            background-color: #fffbf0;
+        }
+        .filter-button.active {
+            background-color: #d97706;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+        /* ! FIN: Estilos para Filtros */
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -119,24 +140,22 @@
     <div class="container mx-auto max-w-6xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-200">
         <!-- Cabecera -->
         <header class="p-6 md:p-8 bg-cover bg-center" style="background-image: url('https://placehold.co/1200x300/8c5a40/f7f3e8?text=Asados+al+Barril');">
-            <h1 class="text-3xl md:text-5xl font-bold text-white text-center" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">
-                Guía Dinámica de Asados al Barril
-            </h1>
-            <p class="text-center text-lg text-white mt-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Basado en la guía de Doctor Burger</p>
+            <!-- Título eliminado -->
         </header>
 
         <!-- Pestañas de Navegación -->
         <nav class="flex border-b border-gray-300 bg-gray-50">
-            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-600 active" data-tab="tecnicas">
+            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-800 active" data-tab="tecnicas">
                 Técnicas Esenciales
             </button>
-            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-600" data-tab="recetas">
+            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-800" data-tab="recetas">
                 Recetario Completo
             </button>
         </nav>
 
         <!-- Contenido de Pestañas -->
-        <main class="p-6 md:p-8">
+        <!-- ! MODIFICACIÓN: Se añade padding inferior (pb-16) para más espacio vertical -->
+        <main class="p-6 md:p-8 pb-16">
 
             <!-- Pestaña de Técnicas -->
             <section id="tecnicas-content" class="tab-content active space-y-4">
@@ -225,14 +244,23 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li><strong>Técnicas de Cocción:</strong>
+                            <!-- ! INICIO: Modificación - Separación de Técnicas -->
+                            <li><strong>Cocción Lenta (Indirecta):</strong>
                                 <ul class="list-disc ml-6 mt-1 space-y-2">
-                                    <li><strong>Cocción Directa:</strong> Sobre el fuego. Tiempos cortos (ej. filete 3-5 min por lado).</li>
-                                    <li><strong>Cocción Indirecta:</strong> Lejos del fuego. Tiempos largos (ej. brisket 10-12 horas a 107-121°C).</li>
+                                    <li><strong>Definición:</strong> La carne se coloca lejos del fuego directo. Es la técnica principal para asados al barril (BBQ).</li>
+                                    <li><strong>Uso:</strong> Perfecta para piezas grandes que requieren tiempos largos (ej. brisket 10-12 horas a 107-121°C). Logra la textura tierna y desmenuzable.</li>
                                     <li><strong>Humedad:</strong> Colocar recipientes con agua en el barril para evitar que la carne se seque.</li>
                                     <li><strong>Rotación:</strong> Girar y voltear la carne (especialmente piezas grandes) para cocción uniforme.</li>
                                 </ul>
                             </li>
+                            <li><strong>Cocción Rápida (Directa / Sellado):</strong>
+                                <ul class="list-disc ml-6 mt-1 space-y-2">
+                                    <li><strong>Definición:</strong> La carne se coloca directamente sobre las brasas calientes.</li>
+                                    <li><strong>Uso:</strong> Ideal para sellar la carne, crear una costra (reacción de Maillard) y cocinar cortes más delgados.</li>
+                                    <li><strong>Tiempos Cortos:</strong> Se usa para filetes (3-5 min por lado), costillas de cordero (3-4 min por lado) o para dorar la carne antes de pasarla a cocción indirecta.</li>
+                                </ul>
+                            </li>
+                            <!-- ! FIN: Modificación -->
                             <li><strong>Sabor Ahumado Perfecto:</strong>
                                 <ul class="list-disc ml-6 mt-1 space-y-2">
                                     <li><strong>Selección de Madera:</strong> Nogal (suave), Manzano (frutal), Nogal Americano (fuerte), Mezquite (intenso).</li>
@@ -265,91 +293,102 @@
             <!-- Pestaña de Recetas -->
             <section id="recetas-content" class="tab-content">
                 
-                <!--! REVERSIÓN: Barra de búsqueda eliminada -->
+                <!-- ! INICIO: Contenedor de Filtros -->
+                <div id="filter-container" class="flex flex-wrap gap-2 mb-8">
+                    <button class="filter-button active" data-filter="todos">Ver Todo</button>
+                    <button class="filter-button" data-filter="cerdo">🐖 Cerdo</button>
+                    <button class="filter-button" data-filter="res">🐄 Res</button>
+                    <button class="filter-button" data-filter="pollo">🐓 Pollo</button>
+                    <button class="filter-button" data-filter="cordero">🐑 Cordero</button>
+                    <button class="filter-button" data-filter="pavo">🦃 Pavo</button>
+                    <button class="filter-button" data-filter="pescado">🐟 Pescado</button>
+                    <button class="filter-button" data-filter="acompanamiento">🥗 Acompañamiento</button>
+                </div>
+                <!-- ! FIN: Contenedor de Filtros -->
 
                 <!-- Platos Principales -->
                 <h2 id="header-principales" class="text-3xl font-bold text-amber-800 mb-6 border-b-2 border-amber-300 pb-2">Platos Principales (Cap. 5)</h2>
                 <div id="grid-principales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
                     <!-- Tarjetas de Recetas Principales -->
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillar-clasico">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillar-clasico" data-category="cerdo">
                         <img src="https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo" alt="Costillar de Cerdo" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Costillar de Cerdo con Sazonado Clásico</h3>
                         </div>
                     </div>
                     
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-brisket">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-brisket" data-category="res">
                         <img src="https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res" alt="Brisket de Res" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Brisket de Res Ahumado</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pollo-citricos">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pollo-citricos" data-category="pollo">
                         <img src="https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado" alt="Pollo Asado" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Pollo Asado con Marinado de Hierbas y Cítricos</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-cordero-menta">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-cordero-menta" data-category="cordero">
                         <img src="https://placehold.co/400x200/8c7a6b/ffffff?text=Costillas+de+Cordero" alt="Costillas de Cordero" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Costillas de Cordero con Salsa de Menta</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pavo-arce">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pavo-arce" data-category="pavo">
                         <img src="https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo" alt="Pechuga de Pavo" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Pechuga de Pavo Ahumada con Glaseado de Arce y Mostaza</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-miel-mostaza">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-miel-mostaza" data-category="cerdo">
                         <img src="https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza" alt="Costillas Miel Mostaza" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Costillas de Cerdo con Glaseado de Miel y Mostaza</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-coreanas">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-coreanas" data-category="cerdo">
                         <img src="https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas" alt="Costillas Coreanas" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Costillas de Cerdo Coreanas a la Parrilla</h3>
                         </div>
                     </div>
                     
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-ciruela">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-ciruela" data-category="cerdo">
                         <img src="https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela" alt="Costillas con Ciruela" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Costillas de Cerdo con Salsa de Ciruela</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-crujiente">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-crujiente" data-category="cerdo">
                         <img src="https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente" alt="Chicharrón Crujiente" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Chicharrón al Barril Crujiente</h3>
                         </div>
                     </div>
                     
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-limon">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-limon" data-category="cerdo">
                         <img src="https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile" alt="Chicharrón Limón y Chile" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Chicharrón al Barril con Sabor a Limón y Chile</h3>
                         </div>
                     </div>
                     
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-limon">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-limon" data-category="pescado">
                         <img src="https://placehold.co/400x200/bde0fe/4a2d1f?text=Pescado+al+Barril" alt="Pescado al Barril" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Pescado al Barril con Salsa de Hierbas y Limón</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-mantequilla">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-mantequilla" data-category="pescado">
                         <img src="https://placehold.co/400x200/cddfa0/4a2d1f?text=Pescado+con+Mantequilla" alt="Pescado con Mantequilla" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Pescado al Barril con Salsa de Mantequilla y Hierbas</h3>
@@ -363,63 +402,63 @@
                 <div id="grid-acompanamientos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
                     <!-- Tarjetas de Recetas Acompañamientos -->
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-ahumado">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-ahumado" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/f0e6d2/4a2d1f?text=Puré+de+Papas+Ahumado" alt="Puré de Papas Ahumado" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Puré de Papas Ahumadas</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-col">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-col" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/55a630/ffffff?text=Ensalada+de+Col+Rizada" alt="Ensalada de Col Rizada" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Ensalada de Col Rizada con Vinagreta</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-salsa-bbq">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-salsa-bbq" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/8f250c/ffffff?text=Salsa+Barbacoa" alt="Salsa Barbacoa" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Salsa Barbacoa Casera</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-maiz-parrilla">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-maiz-parrilla" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/fde047/4a2d1f?text=Maíz+a+la+Parrilla" alt="Maíz a la Parrilla" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Maíz a la Parrilla con Mantequilla de Hierbas</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-esparragos">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-esparragos" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/84cc16/ffffff?text=Espárragos" alt="Espárragos" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Espárragos a la Parrilla con Limón y Parmesano</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-tomate">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-tomate" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/ef4444/ffffff?text=Ensalada+Tomate+Mozzarella" alt="Ensalada Tomate Mozzarella" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Ensalada de Tomate y Mozzarella con Albahaca</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-papas-hasselback">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-papas-hasselback" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/f5cb5c/4a2d1f?text=Papas+Hasselback" alt="Papas Hasselback" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Papas Hasselback con Hierbas y Queso</h3>
                         </div>
                     </div>
 
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-yuca-frita">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-yuca-frita" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/ffe8d6/4a2d1f?text=Yuca+Frita+con+Mojo" alt="Yuca Frita con Mojo" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Yuca Frita con Mojo</h3>
                         </div>
                     </div>
                     
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-yuca">
+                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-yuca" data-category="acompanamiento">
                         <img src="https://placehold.co/400x200/fff4e6/4a2d1f?text=Puré+de+Yuca" alt="Puré de Yuca" class="w-full h-40 object-cover">
                         <div class="p-4">
                             <h3 class="text-lg font-bold">Puré de Yuca con Queso</h3>
@@ -430,6 +469,13 @@
 
             </section>
         </main>
+
+        <!-- ! INICIO: Footer con Créditos -->
+        <footer class="p-6 text-center text-sm text-gray-500 border-t border-gray-300 bg-gray-50">
+            <p>Créditos: Juan Miguel Rios Redondo</p>
+        </footer>
+        <!-- ! FIN: Footer con Créditos -->
+
     </div>
 
     <!-- Modal para Recetas -->
@@ -1018,20 +1064,51 @@
                     }
                 });
             }
-            // Cerrar al hacer clic en el botón 'X'
-            if (modalClose) {
-                modalClose.addEventListener('click', closeModal);
-            }
-
-            // Cerrar modal con la tecla 'Escape'
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modal && modal.style.display === 'flex') {
-                    closeModal();
-                }
-            });
 
             // ---! REVERSIÓN: Funcionalidad de Búsqueda Eliminada ---
             
+            // ---! INICIO: Funcionalidad de Filtros de Categoría ---
+            const filterContainer = document.getElementById('filter-container');
+            const allRecipeCards = document.querySelectorAll('.recipe-card');
+            const headerPrincipales = document.getElementById('header-principales');
+            const headerAcompanamientos = document.getElementById('header-acompanamientos');
+
+            if (filterContainer) {
+                filterContainer.addEventListener('click', (event) => {
+                    // Asegurarse de que se hizo clic en un botón
+                    if (event.target.classList.contains('filter-button')) {
+                        const filter = event.target.dataset.filter;
+
+                        // Actualizar estado del botón
+                        filterContainer.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+                        event.target.classList.add('active');
+
+                        // Filtrar tarjetas
+                        allRecipeCards.forEach(card => {
+                            const category = card.dataset.category;
+                            if (filter === 'todos' || filter === category) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+
+                        // Mostrar/ocultar cabeceras
+                        if (filter === 'todos') {
+                            if (headerPrincipales) headerPrincipales.style.display = 'block';
+                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'block';
+                        } else if (filter === 'acompanamiento') {
+                            if (headerPrincipales) headerPrincipales.style.display = 'none';
+                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'block';
+                        } else { // Es un filtro de plato principal (cerdo, res, etc.)
+                            if (headerPrincipales) headerPrincipales.style.display = 'block';
+                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            // ---! FIN: Funcionalidad de Filtros de Categoría ---
+
         });
     </script>
 </body>
