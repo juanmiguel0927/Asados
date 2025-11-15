@@ -485,7 +485,7 @@
     <!-- ! INICIO: Base de datos de recetas en JSON y Lógica de la App -->
     <script>
         // --- INICIO: Base de Datos de Recetas (JSON) ---
-        // ! SE HAN AÑADIDO: timeMinutes, difficultyValue, y tips
+        // ! REFACTORIZADO: 'content' se ha dividido en 'ingredients' (objetos) e 'instructions' (strings).
         const recipeData = [
             // --- PLATOS PRINCIPALES ---
             {
@@ -494,35 +494,28 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo',
                 time: '3-4 horas',
-                timeMinutes: 210, // 3.5 * 60
+                timeMinutes: 210,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 costillar de cerdo (aprox. 2 kg).</li>
-                        <li>Sazonado Clásico (Cap. 2):
-                            <ul class="list-disc pl-6">
-                                <li>2 cdas de sal</li>
-                                <li>2 cdas de pimienta negra</li>
-                                <li>1 cda de paprika</li>
-                                <li>1 cda de azúcar moreno</li>
-                                <li>1 cdta de ajo en polvo</li>
-                                <li>1 cdta de cebolla en polvo</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca el costillar.</li>
-                        <li>Aplica generosamente el sazonado clásico por toda la superficie.</li>
-                        <li>Precalienta el barril a 121°C.</li>
-                        <li>Coloca el costillar en la zona indirecta.</li>
-                        <li>Cocina por 3-4 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
-                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                        <li>Retira, deja reposar 15 minutos y corta.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "", name: "costillar de cerdo (aprox. 2 kg)." },
+                    { amount: "", unit: "", name: "Sazonado Clásico (Cap. 2):", isSubheader: true },
+                    { amount: "2", unit: "cdas", name: "de sal", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de pimienta negra", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de paprika", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de azúcar moreno", isSubItem: true },
+                    { amount: "1", unit: "cdta", name: "de ajo en polvo", isSubItem: true },
+                    { amount: "1", unit: "cdta", name: "de cebolla en polvo", isSubItem: true }
+                ],
+                instructions: [
+                    "Lava y seca el costillar.",
+                    "Aplica generosamente el sazonado clásico por toda la superficie.",
+                    "Precalienta el barril a 121°C.",
+                    "Coloca el costillar en la zona indirecta.",
+                    "Cocina por 3-4 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.",
+                    "Verifica que la temperatura interna alcance los 71°C.",
+                    "Retira, deja reposar 15 minutos y corta."
+                ],
                 tips: 'Para una costra más sabrosa, puedes rociar el costillar con jugo de manzana cada 45 minutos durante la cocción.'
             },
             {
@@ -531,34 +524,27 @@
                 category: 'res',
                 image: 'https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res',
                 time: '10-12 horas',
-                timeMinutes: 660, // 11 * 60
+                timeMinutes: 660,
                 difficulty: 'Difícil',
                 difficultyValue: 3,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 brisket de res (4-5 kg).</li>
-                        <li>Sazonado Ahumado (Cap. 2):
-                            <ul class="list-disc pl-6">
-                                <li>3 cdas de sal ahumada</li>
-                                <li>2 cdas de pimienta negra</li>
-                                <li>1 cda de pimentón ahumado</li>
-                                <li>1 cda de ajo en polvo</li>
-                                <li>1 cda de cebolla en polvo</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca el brisket.</li>
-                        <li>Aplica el sazonado ahumado por todas las superficies.</li>
-                        <li>Precalienta el barril a 107°C.</li>
-                        <li>Coloca el brisket en la zona indirecta, con la grasa hacia arriba.</li>
-                        <li>Cocina por 10-12 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
-                        <li>Verifica que la temperatura interna alcance los 88-93°C.</li>
-                        <li>Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "", name: "brisket de res (4-5 kg)." },
+                    { amount: "", unit: "", name: "Sazonado Ahumado (Cap. 2):", isSubheader: true },
+                    { amount: "3", unit: "cdas", name: "de sal ahumada", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de pimienta negra", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de pimentón ahumado", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de ajo en polvo", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de cebolla en polvo", isSubItem: true }
+                ],
+                instructions: [
+                    "Lava y seca el brisket.",
+                    "Aplica el sazonado ahumado por todas las superficies.",
+                    "Precalienta el barril a 107°C.",
+                    "Coloca el brisket en la zona indirecta, con la grasa hacia arriba.",
+                    "Cocina por 10-12 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.",
+                    "Verifica que la temperatura interna alcance los 88-93°C.",
+                    "Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar."
+                ],
                 tips: 'La paciencia es clave. No subas el fuego. Para atravesar el "estancamiento" (stall) alrededor de los 70°C, puedes envolver el brisket en papel de estraza (butcher paper).'
             },
             {
@@ -567,35 +553,28 @@
                 category: 'pollo',
                 image: 'https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado',
                 time: '1.5-2 horas',
-                timeMinutes: 105, // 1.75 * 60
+                timeMinutes: 105,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 pollo entero (aprox. 2 kg).</li>
-                        <li>Marinado de Hierbas y Cítricos (Cap. 3):
-                            <ul class="list-disc pl-6">
-                                <li>1/2 taza de jugo de limón fresco</li>
-                                <li>1/4 de taza de aceite de oliva</li>
-                                <li>2 cdas de romero fresco picado</li>
-                                <li>2 cdas de tomillo fresco picado</li>
-                                <li>3 dientes de ajo picados</li>
-                                <li>Sal y pimienta al gusto</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca el pollo.</li>
-                        <li>Prepara el marinado.</li>
-                        <li>Coloca el pollo y el marinado en una bolsa o recipiente. Refrigera por 2-4 horas.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca el pollo en la zona indirecta y cocina por 1-1.5 horas, volteando ocasionalmente.</li>
-                        <li>Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.</li>
-                        <li>Retira y deja reposar 10 minutos antes de cortar.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "", name: "pollo entero (aprox. 2 kg)." },
+                    { amount: "", unit: "", name: "Marinado de Hierbas y Cítricos (Cap. 3):", isSubheader: true },
+                    { amount: "1/2", unit: "taza", name: "de jugo de limón fresco", isSubItem: true },
+                    { amount: "1/4", unit: "taza", name: "de aceite de oliva", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de romero fresco picado", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de tomillo fresco picado", isSubItem: true },
+                    { amount: "3", unit: "", name: "dientes de ajo picados", isSubItem: true },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
+                ],
+                instructions: [
+                    "Lava y seca el pollo.",
+                    "Prepara el marinado.",
+                    "Coloca el pollo y el marinado en una bolsa o recipiente. Refrigera por 2-4 horas.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca el pollo en la zona indirecta y cocina por 1-1.5 horas, volteando ocasionalmente.",
+                    "Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.",
+                    "Retira y deja reposar 10 minutos antes de cortar."
+                ],
                 tips: 'Para una piel extra crujiente, seca muy bien el pollo con papel de cocina antes de marinarlo (especialmente si el marinado no es a base de aceite).'
             },
             {
@@ -607,33 +586,26 @@
                 timeMinutes: 25,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 costillas de cordero (aprox. 200-250 g c/u).</li>
-                        <li>Salsa de Menta (Basada en Adobo de Yogur y Hierbas Cap. 3):
-                            <ul class="list-disc pl-6">
-                                <li>1 taza de yogur natural</li>
-                                <li>2 cdas de menta fresca picada</li>
-                                <li>2 cdas de cilantro fresco picado</li>
-                                <li>1 cdta de comino molido</li>
-                                <li>1 cdta de paprika</li>
-                                <li>Sal y pimienta al gusto</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca las costillas.</li>
-                        <li>Prepara la salsa/adobo de menta.</li>
-                        <li>Aplica una capa generosa sobre las costillas y marina por al menos 30 minutos.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca las costillas en la zona directa y cocina 3-4 minutos por lado (para dorar).</li>
-                        <li>Mueve a la zona indirecta y continúa cocinando 8-10 minutos, volteando y cepillando con más salsa.</li>
-                        <li>Verifica que la temperatura interna alcance los 63-71°C (punto medio).</li>
-                        <li>Sirve con más salsa por encima.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "", name: "costillas de cordero (aprox. 200-250 g c/u)." },
+                    { amount: "", unit: "", name: "Salsa de Menta (Basada en Adobo de Yogur y Hierbas Cap. 3):", isSubheader: true },
+                    { amount: "1", unit: "taza", name: "de yogur natural", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de menta fresca picada", isSubItem: true },
+                    { amount: "2", unit: "cdas", name: "de cilantro fresco picado", isSubItem: true },
+                    { amount: "1", unit: "cdta", name: "de comino molido", isSubItem: true },
+                    { amount: "1", unit: "cdta", name: "de paprika", isSubItem: true },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
+                ],
+                instructions: [
+                    "Lava y seca las costillas.",
+                    "Prepara la salsa/adobo de menta.",
+                    "Aplica una capa generosa sobre las costillas y marina por al menos 30 minutos.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca las costillas en la zona directa y cocina 3-4 minutos por lado (para dorar).",
+                    "Mueve a la zona indirecta y continúa cocinando 8-10 minutos, volteando y cepillando con más salsa.",
+                    "Verifica que la temperatura interna alcance los 63-71°C (punto medio).",
+                    "Sirve con más salsa por encima."
+                ],
                 tips: 'El cordero se cocina rápido. No lo cocines en exceso. El punto medio (rosa por dentro) es ideal para mantener su jugosidad.'
             },
             {
@@ -642,35 +614,28 @@
                 category: 'pavo',
                 image: 'https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo',
                 time: '2-3 horas',
-                timeMinutes: 150, // 2.5 * 60
+                timeMinutes: 150,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 pechuga de pavo (aprox. 2 kg).</li>
-                        <li>Glaseado de Arce y Mostaza (No está en Cap. 3, asumiendo receta estándar):
-                            <ul class="list-disc pl-6">
-                                <li>1/2 taza de sirope de arce</li>
-                                <li>1/4 taza de mostaza Dijon</li>
-                                <li>1 cda de aceite de oliva</li>
-                                <li>1 cdta de paprika</li>
-                                <li>Sal y pimienta al gusto</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca la pechuga de pavo.</li>
-                        <li>Prepara el glaseado mezclando los ingredientes.</li>
-                        <li>Aplica el glaseado sobre la pechuga uniformemente.</li>
-                        <li>Precalienta el barril a 149°C.</li>
-                        <li>Coloca la pechuga en la zona indirecta.</li>
-                        <li>Cocina por 2-3 horas, aplicando más glaseado regularmente.</li>
-                        <li>Verifica que la temperatura interna alcance los 74-79°C.</li>
-                        <li>Retira, deja reposar 10 minutos y rebana.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "", name: "pechuga de pavo (aprox. 2 kg)." },
+                    { amount: "", unit: "", name: "Glaseado de Arce y Mostaza:", isSubheader: true },
+                    { amount: "1/2", unit: "taza", name: "de sirope de arce", isSubItem: true },
+                    { amount: "1/4", unit: "taza", name: "de mostaza Dijon", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de aceite de oliva", isSubItem: true },
+                    { amount: "1", unit: "cdta", name: "de paprika", isSubItem: true },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
+                ],
+                instructions: [
+                    "Lava y seca la pechuga de pavo.",
+                    "Prepara el glaseado mezclando los ingredientes.",
+                    "Aplica el glaseado sobre la pechuga uniformemente.",
+                    "Precalienta el barril a 149°C.",
+                    "Coloca la pechuga en la zona indirecta.",
+                    "Cocina por 2-3 horas, aplicando más glaseado regularmente.",
+                    "Verifica que la temperatura interna alcance los 74-79°C.",
+                    "Retira, deja reposar 10 minutos y rebana."
+                ],
                 tips: 'El pavo tiende a secarse. Usar un marinado o salmuera antes de glasear puede ayudar a mantenerlo jugoso. No cocines de más.'
             },
             {
@@ -679,32 +644,28 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza',
                 time: '2-3 horas',
-                timeMinutes: 150, // 2.5 * 60
+                timeMinutes: 150,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                        <li>1/2 taza de miel.</li>
-                        <li>1/4 taza de mostaza Dijon.</li>
-                        <li>2 cdas de salsa de soja.</li>
-                        <li>2 cdta de pimentón ahumado.</li>
-                        <li>1 cdta de ajo en polvo.</li>
-                        <li>1 cdta de cebolla en polvo.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca las costillas.</li>
-                        <li>Mezcla miel, mostaza, soja, pimentón, ajo en polvo y cebolla en polvo para el glaseado.</li>
-                        <li>Aplica una capa generosa de glaseado y sazona con sal y pimienta.</li>
-                        <li>Precalienta el barril a 149°C.</li>
-                        <li>Coloca las costillas en la zona indirecta y cocina 2-3 horas, volteando y aplicando más glaseado cada 30 minutos.</li>
-                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                        <li>Retira, corta y sirve con más glaseado.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
+                    { amount: "1/2", unit: "taza", name: "de miel." },
+                    { amount: "1/4", unit: "taza", name: "de mostaza Dijon." },
+                    { amount: "2", unit: "cdas", name: "de salsa de soja." },
+                    { amount: "2", unit: "cdta", name: "de pimentón ahumado." },
+                    { amount: "1", unit: "cdta", name: "de ajo en polvo." },
+                    { amount: "1", unit: "cdta", name: "de cebolla en polvo." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Lava y seca las costillas.",
+                    "Mezcla miel, mostaza, soja, pimentón, ajo en polvo y cebolla en polvo para el glaseado.",
+                    "Aplica una capa generosa de glaseado y sazona con sal y pimienta.",
+                    "Precalienta el barril a 149°C.",
+                    "Coloca las costillas en la zona indirecta y cocina 2-3 horas, volteando y aplicando más glaseado cada 30 minutos.",
+                    "Verifica que la temperatura interna alcance los 71°C.",
+                    "Retira, corta y sirve con más glaseado."
+                ],
                 tips: 'Aplica el glaseado (que contiene azúcar/miel) solo durante los últimos 30-45 minutos de cocción para evitar que se queme.'
             },
             {
@@ -713,33 +674,29 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas',
                 time: '1.5-2 horas',
-                timeMinutes: 105, // 1.75 * 60
+                timeMinutes: 105,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                        <li>1/2 taza de salsa de soja.</li>
-                        <li>1/4 taza de azúcar moreno.</li>
-                        <li>2 cdas de aceite de sésamo.</li>
-                        <li>2 cdas de cebolla verde picada.</li>
-                        <li>2 dientes de ajo picados.</li>
-                        <li>1 cdta de jengibre fresco rallado.</li>
-                        <li>1/2 cdta de pimienta negra.</li>
-                        <li>Semillas de sésamo tostado para decorar.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca las costillas.</li>
-                        <li>Mezcla soja, azúcar, aceite de sésamo, cebolla verde, ajo, jengibre y pimienta para el marinado.</li>
-                        <li>Marbina las costillas en refrigeración por al menos 4 horas o toda la noche.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca las costillas en la zona indirecta y cocina 1-1.5 horas, volteando y aplicando más marinado cada 20 minutos.</li>
-                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                        <li>Retira, espolvorea con semillas de sésamo y sirve.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
+                    { amount: "1/2", unit: "taza", name: "de salsa de soja." },
+                    { amount: "1/4", unit: "taza", name: "de azúcar moreno." },
+                    { amount: "2", unit: "cdas", name: "de aceite de sésamo." },
+                    { amount: "2", unit: "cdas", name: "de cebolla verde picada." },
+                    { amount: "2", unit: "", name: "dientes de ajo picados." },
+                    { amount: "1", unit: "cdta", name: "de jengibre fresco rallado." },
+                    { amount: "1/2", unit: "cdta", name: "de pimienta negra." },
+                    { amount: "", unit: "", name: "Semillas de sésamo tostado para decorar." }
+                ],
+                instructions: [
+                    "Lava y seca las costillas.",
+                    "Mezcla soja, azúcar, aceite de sésamo, cebolla verde, ajo, jengibre y pimienta para el marinado.",
+                    "Marina las costillas en refrigeración por al menos 4 horas o toda la noche.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca las costillas en la zona indirecta y cocina 1-1.5 horas, volteando y aplicando más marinado cada 20 minutos.",
+                    "Verifica que la temperatura interna alcance los 71°C.",
+                    "Retira, espolvorea con semillas de sésamo y sirve."
+                ],
                 tips: 'Para un sabor más intenso, ralla un poco de pera asiática en el marinado. Las enzimas de la pera ayudan a ablandar la carne.'
             },
             {
@@ -748,31 +705,27 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela',
                 time: '2-2.5 horas',
-                timeMinutes: 135, // 2.25 * 60
+                timeMinutes: 135,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                        <li>1 taza de salsa de ciruela.</li>
-                        <li>1/4 taza de salsa de soja.</li>
-                        <li>2 cdas de miel.</li>
-                        <li>2 cdta de jengibre fresco rallado.</li>
-                        <li>1 cdta de ajo picado.</li>
-                        <li>1/2 cdta de pimienta roja triturada (opcional).</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca las costillas.</li>
-                        <li>Mezcla salsa de ciruela, soja, miel, jengibre, ajo y pimienta roja (si se usa).</li>
-                        <li>Aplica la mezcla sobre las costillas y marina al menos 1 hora en refrigeración.</li>
-                        <li>Precalienta el barril a 149°C.</li>
-                        <li>Coloca las costillas en la zona indirecta y cocina 2-2.5 horas, volteando y aplicando más salsa cada 30 minutos.</li>
-                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                        <li>Retira, corta y sirve con más salsa.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
+                    { amount: "1", unit: "taza", name: "de salsa de ciruela." },
+                    { amount: "1/4", unit: "taza", name: "de salsa de soja." },
+                    { amount: "2", unit: "cdas", name: "de miel." },
+                    { amount: "2", unit: "cdta", name: "de jengibre fresco rallado." },
+                    { amount: "1", unit: "cdta", name: "de ajo picado." },
+                    { amount: "1/2", unit: "cdta", name: "de pimienta roja triturada (opcional)." }
+                ],
+                instructions: [
+                    "Lava y seca las costillas.",
+                    "Mezcla salsa de ciruela, soja, miel, jengibre, ajo y pimienta roja (si se usa).",
+                    "Aplica la mezcla sobre las costillas y marina al menos 1 hora en refrigeración.",
+                    "Precalienta el barril a 149°C.",
+                    "Coloca las costillas en la zona indirecta y cocina 2-2.5 horas, volteando y aplicando más salsa cada 30 minutos.",
+                    "Verifica que la temperatura interna alcance los 71°C.",
+                    "Retira, corta y sirve con más salsa."
+                ],
                 tips: 'La salsa de ciruela (a menudo usada en cocina asiática) puede ser espesa. Puedes aligerarla con un chorrito de vinagre de arroz.'
             },
             {
@@ -781,31 +734,27 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente',
                 time: '1-2 horas',
-                timeMinutes: 90, // 1.5 * 60
+                timeMinutes: 90,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 kg de piel de cerdo, cortada en trozos pequeños.</li>
-                        <li>2 cdas de sal gruesa.</li>
-                        <li>1 cdta de pimienta negra molida.</li>
-                        <li>1 cdta de pimentón ahumado.</li>
-                        <li>Aceite vegetal para freír.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca cuidadosamente la piel de cerdo.</li>
-                        <li>Mezcla sal, pimienta y pimentón ahumado.</li>
-                        <li>Espolvorea y frota las especias sobre la piel.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca la piel en la zona indirecta y cocina 1-2 horas hasta que esté crujiente y dorada, girando ocasionalmente.</li>
-                        <li>Retira y escurre sobre papel absorbente.</li>
-                        <li>Calienta aceite vegetal en una sartén grande a 180°C.</li>
-                        <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
-                        <li>Escurre el exceso de aceite y sirve caliente.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "kg", name: "de piel de cerdo, cortada en trozos pequeños." },
+                    { amount: "2", unit: "cdas", name: "de sal gruesa." },
+                    { amount: "1", unit: "cdta", name: "de pimienta negra molida." },
+                    { amount: "1", unit: "cdta", name: "de pimentón ahumado." },
+                    { amount: "", unit: "", name: "Aceite vegetal para freír." }
+                ],
+                instructions: [
+                    "Lava y seca cuidadosamente la piel de cerdo.",
+                    "Mezcla sal, pimienta y pimentón ahumado.",
+                    "Espolvorea y frota las especias sobre la piel.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca la piel en la zona indirecta y cocina 1-2 horas hasta que esté crujiente y dorada, girando ocasionalmente.",
+                    "Retira y escurre sobre papel absorbente.",
+                    "Calienta aceite vegetal en una sartén grande a 180°C.",
+                    "Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.",
+                    "Escurre el exceso de aceite y sirve caliente."
+                ],
                 tips: 'El secreto del chicharrón es que la piel esté MUY seca. Déjala secar en la nevera sin tapar durante unas horas antes de cocinarla.'
             },
             {
@@ -814,33 +763,29 @@
                 category: 'cerdo',
                 image: 'https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile',
                 time: '1-2 horas',
-                timeMinutes: 90, // 1.5 * 60
+                timeMinutes: 90,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 kg de piel de cerdo, cortada en tiras delgadas.</li>
-                        <li>2 limones (jugo y ralladura).</li>
-                        <li>2 cdas de sal.</li>
-                        <li>1 cda de chile en polvo.</li>
-                        <li>1 cdta de ajo en polvo.</li>
-                        <li>1 cdta de comino molido.</li>
-                        <li>Aceite vegetal para freír.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y seca las tiras de piel.</li>
-                        <li>Mezcla jugo y ralladura de limón, sal, chile en polvo, ajo en polvo y comino.</li>
-                        <li>Marina la piel en la mezcla por al menos 30 minutos en refrigeración.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca las tiras en la zona indirecta y cocina 1-2 horas hasta que estén crujientes y doradas, girando ocasionalmente.</li>
-                        <li>Retira y escurre sobre papel absorbente.</li>
-                        <li>Calienta aceite vegetal a 180°C.</li>
-                        <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
-                        <li>Escurre el exceso de aceite y sirve caliente con rodajas de limón.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "kg", name: "de piel de cerdo, cortada en tiras delgadas." },
+                    { amount: "2", unit: "", name: "limones (jugo y ralladura)." },
+                    { amount: "2", unit: "cdas", name: "de sal." },
+                    { amount: "1", unit: "cda", name: "de chile en polvo." },
+                    { amount: "1", unit: "cdta", name: "de ajo en polvo." },
+                    { amount: "1", unit: "cdta", name: "de comino molido." },
+                    { amount: "", unit: "", name: "Aceite vegetal para freír." }
+                ],
+                instructions: [
+                    "Lava y seca las tiras de piel.",
+                    "Mezcla jugo y ralladura de limón, sal, chile en polvo, ajo en polvo y comino.",
+                    "Marina la piel en la mezcla por al menos 30 minutos en refrigeración.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca las tiras en la zona indirecta y cocina 1-2 horas hasta que estén crujientes y doradas, girando ocasionalmente.",
+                    "Retira y escurre sobre papel absorbente.",
+                    "Calienta aceite vegetal a 180°C.",
+                    "Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.",
+                    "Escurre el exceso de aceite y sirve caliente con rodajas de limón."
+                ],
                 tips: 'No añadas la ralladura de limón hasta el final (después de freír) para un sabor a limón más fresco, ya que puede quemarse.'
             },
             {
@@ -852,26 +797,22 @@
                 timeMinutes: 18,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 filetes de pescado (aprox. 150 g c/u), como lubina o trucha.</li>
-                        <li>2 limones (jugo y ralladura).</li>
-                        <li>3 cdas de aceite de oliva.</li>
-                        <li>2 dientes de ajo, picados.</li>
-                        <li>2 cdas de perejil fresco picado.</li>
-                        <li>1 cdta de tomillo fresco.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Mezcla jugo y ralladura de limón, aceite de oliva, ajo, perejil, tomillo, sal y pimienta.</li>
-                        <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
-                        <li>Sirve con un poco de la salsa por encima.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "filetes", name: "de pescado (aprox. 150 g c/u), como lubina o trucha." },
+                    { amount: "2", unit: "", name: "limones (jugo y ralladura)." },
+                    { amount: "3", unit: "cdas", name: "de aceite de oliva." },
+                    { amount: "2", unit: "", name: "dientes de ajo, picados." },
+                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
+                    { amount: "1", unit: "cdta", name: "de tomillo fresco." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Mezcla jugo y ralladura de limón, aceite de oliva, ajo, perejil, tomillo, sal y pimienta.",
+                    "Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.",
+                    "Sirve con un poco de la salsa por encima."
+                ],
                 tips: 'El pescado se cocina muy rápido. Estará listo cuando se desmenuce fácilmente con un tenedor. No lo dejes ni un minuto de más.'
             },
             {
@@ -883,29 +824,24 @@
                 timeMinutes: 18,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 filetes de pescado (aprox. 150 g c/u), como salmón o trucha.</li>
-                        <li>1/2 taza (115 g) de mantequilla derretida.</li>
-                        <li>2 cdas de perejil fresco picado.</li>
-                        <li>2 cdas de cilantro fresco picado.</li>
-                        <li>1 cda de estragón fresco picado.</li>
-                        <li>2 cdta de jugo de limón.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Mezcla mantequilla derretida, perejil, cilantro, estragón, jugo de limón, sal y pimienta.</li>
-                        <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
-                        <li>Precalienta el barril a 177°C.</li>
-                        <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
-                        <li>Sirve con un poco de la salsa por encima.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "filetes", name: "de pescado (aprox. 150 g c/u), como salmón o trucha." },
+                    { amount: "1/2", unit: "taza", name: "(115 g) de mantequilla derretida." },
+                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
+                    { amount: "2", unit: "cdas", name: "de cilantro fresco picado." },
+                    { amount: "1", unit: "cda", name: "de estragón fresco picado." },
+                    { amount: "2", unit: "cdta", name: "de jugo de limón." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Mezcla mantequilla derretida, perejil, cilantro, estragón, jugo de limón, sal y pimienta.",
+                    "Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.",
+                    "Precalienta el barril a 177°C.",
+                    "Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.",
+                    "Sirve con un poco de la salsa por encima."
+                ],
                 tips: 'Para salmón, considera cocinarlo sobre una tabla de cedro (remojada previamente) en la parrilla para un sabor ahumado extra.'
             },
-
             // --- ACOMPAÑAMIENTOS ---
             {
                 id: 'receta-pure-ahumado',
@@ -916,22 +852,18 @@
                 timeMinutes: 45,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 papas grandes, peladas y en cubos.</li>
-                        <li>1/2 taza de leche caliente.</li>
-                        <li>2 cdas de mantequilla.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Cocina las papas en agua con sal hasta que estén tiernas. Escúrrelas.</li>
-                        <li>Precalienta el barril a baja temperatura y agrega astillas de madera de manzana.</li>
-                        <li>Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.</li>
-                        <li>Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "", name: "papas grandes, peladas y en cubos." },
+                    { amount: "1/2", unit: "taza", name: "de leche caliente." },
+                    { amount: "2", unit: "cdas", name: "de mantequilla." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Cocina las papas en agua con sal hasta que estén tiernas. Escúrrelas.",
+                    "Precalienta el barril a baja temperatura y agrega astillas de madera de manzana.",
+                    "Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.",
+                    "Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave."
+                ],
                 tips: 'Usa una madera de sabor suave como manzano o cerezo para ahumar las papas. Maderas fuertes como el mezquite pueden ser demasiado intensas.'
             },
             {
@@ -943,29 +875,22 @@
                 timeMinutes: 10,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 tazas de col rizada, lavada y picada.</li>
-                        <li>1/4 taza de pasas.</li>
-                        <li>1/4 taza de nueces tostadas.</li>
-                        <li>Para la vinagreta:
-                            <ul class="list-disc pl-6">
-                                <li>2 cdas de aceite de oliva.</li>
-                                <li>1 cda de vinagre de sidra de manzana.</li>
-                                <li>1 cda de mostaza Dijon.</li>
-                                <li>1 cda de miel.</li>
-                                <li>Sal y pimienta al gusto.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>En un tazón grande, combina la col rizada, pasas y nueces.</li>
-                        <li>En otro tazón, mezcla los ingredientes de la vinagreta.</li>
-                        <li>Vierte la vinagreta sobre la ensalada y mezcla bien.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "tazas", name: "de col rizada, lavada y picada." },
+                    { amount: "1/4", unit: "taza", name: "de pasas." },
+                    { amount: "1/4", unit: "taza", name: "de nueces tostadas." },
+                    { amount: "", unit: "", name: "Para la vinagreta:", isSubheader: true },
+                    { amount: "2", unit: "cdas", name: "de aceite de oliva.", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de vinagre de sidra de manzana.", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de mostaza Dijon.", isSubItem: true },
+                    { amount: "1", unit: "cda", name: "de miel.", isSubItem: true },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto.", isSubItem: true }
+                ],
+                instructions: [
+                    "En un tazón grande, combina la col rizada, pasas y nueces.",
+                    "En otro tazón, mezcla los ingredientes de la vinagreta.",
+                    "Vierte la vinagreta sobre la ensalada y mezcla bien."
+                ],
                 tips: 'La col rizada (kale) puede ser dura. "Masajea" la col con la vinagreta usando tus manos durante 1-2 minutos para ablandar las hojas.'
             },
             {
@@ -977,26 +902,22 @@
                 timeMinutes: 15,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 taza de kétchup.</li>
-                        <li>1/4 taza de vinagre de sidra de manzana.</li>
-                        <li>2 cdas de azúcar moreno.</li>
-                        <li>1 cda de mostaza Dijon.</li>
-                        <li>1 cdta de salsa Worcestershire.</li>
-                        <li>1 cdta de pimentón ahumado.</li>
-                        <li>1/2 cdta de ajo en polvo.</li>
-                        <li>1/2 cdta de cebolla en polvo.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Combina todos los ingredientes en una cacerola a fuego medio.</li>
-                        <li>Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.</li>
-                        <li>Deja enfriar antes de usar.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "taza", name: "de kétchup." },
+                    { amount: "1/4", unit: "taza", name: "de vinagre de sidra de manzana." },
+                    { amount: "2", unit: "cdas", name: "de azúcar moreno." },
+                    { amount: "1", unit: "cda", name: "de mostaza Dijon." },
+                    { amount: "1", unit: "cdta", name: "de salsa Worcestershire." },
+                    { amount: "1", unit: "cdta", name: "de pimentón ahumado." },
+                    { amount: "1/2", unit: "cdta", name: "de ajo en polvo." },
+                    { amount: "1/2", unit: "cdta", name: "de cebolla en polvo." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Combina todos los ingredientes en una cacerola a fuego medio.",
+                    "Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.",
+                    "Deja enfriar antes de usar."
+                ],
                 tips: 'Para una salsa más compleja, añade 1/4 de taza de bourbon o ron oscuro durante la cocción.'
             },
             {
@@ -1008,24 +929,20 @@
                 timeMinutes: 20,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 mazorcas de maíz, con hojas.</li>
-                        <li>4 cdas de mantequilla derretida.</li>
-                        <li>2 cdas de perejil fresco picado.</li>
-                        <li>2 cdas de cebollín fresco picado.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Remoja las mazorcas en agua por al menos 30 minutos.</li>
-                        <li>Precalienta el barril a temperatura media-alta.</li>
-                        <li>Asa las mazorcas directamente en la parrilla, girando, por 10-15 minutos o hasta que estén tiernas y doradas.</li>
-                        <li>Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.</li>
-                        <li>Cepilla el maíz con la mantequilla de hierbas antes de servir.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "mazorcas", name: "de maíz, con hojas." },
+                    { amount: "4", unit: "cdas", name: "de mantequilla derretida." },
+                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
+                    { amount: "2", unit: "cdas", name: "de cebollín fresco picado." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Remoja las mazorcas en agua por al menos 30 minutos.",
+                    "Precalienta el barril a temperatura media-alta.",
+                    "Asa las mazorcas directamente en la parrilla, girando, por 10-15 minutos o hasta que estén tiernas y doradas.",
+                    "Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.",
+                    "Cepilla el maíz con la mantequilla de hierbas antes de servir."
+                ],
                 tips: 'No quites todas las hojas del maíz. Tira de ellas hacia atrás, quita los pelos, unta el maíz con mantequilla de hierbas y vuelve a cerrar las hojas. Asa el maíz envuelto en sus propias hojas.'
             },
             {
@@ -1037,24 +954,20 @@
                 timeMinutes: 10,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>1 manojo de espárragos frescos.</li>
-                        <li>2 cdas de aceite de oliva.</li>
-                        <li>1 limón (jugo y ralladura).</li>
-                        <li>1/4 taza de queso parmesano rallado.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava y recorta los extremos leñosos de los espárragos.</li>
-                        <li>Mezcla aceite de oliva, jugo y ralladura de limón, parmesano, sal y pimienta.</li>
-                        <li>Cepilla los espárragos con esta mezcla.</li>
-                        <li>Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.</li>
-                        <li>Sirve con más ralladura de limón y parmesano.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "1", unit: "manojo", name: "de espárragos frescos." },
+                    { amount: "2", unit: "cdas", name: "de aceite de oliva." },
+                    { amount: "1", unit: "", name: "limón (jugo y ralladura)." },
+                    { amount: "1/4", unit: "taza", name: "de queso parmesano rallado." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Lava y recorta los extremos leñosos de los espárragos.",
+                    "Mezcla aceite de oliva, jugo y ralladura de limón, parmesano, sal y pimienta.",
+                    "Cepilla los espárragos con esta mezcla.",
+                    "Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.",
+                    "Sirve con más ralladura de limón y parmesano."
+                ],
                 tips: 'Añade el queso parmesano solo en el último minuto de cocción, o se quemará y amargará.'
             },
             {
@@ -1066,24 +979,20 @@
                 timeMinutes: 5,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 tomates medianos, en rodajas.</li>
-                        <li>200 g de queso mozzarella fresco, en rodajas.</li>
-                        <li>Hojas frescas de albahaca.</li>
-                        <li>2 cdas de aceite de oliva virgen extra.</li>
-                        <li>Vinagre balsámico.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Alterna las rodajas de tomate y mozzarella en un plato.</li>
-                        <li>Coloca hojas de albahaca entre las rodajas.</li>
-                        <li>Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.</li>
-                        <li>Deja reposar unos minutos antes de servir.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "", name: "tomates medianos, en rodajas." },
+                    { amount: "200", unit: "g", name: "de queso mozzarella fresco, en rodajas." },
+                    { amount: "", unit: "", name: "Hojas frescas de albahaca." },
+                    { amount: "2", unit: "cdas", name: "de aceite de oliva virgen extra." },
+                    { amount: "", unit: "", name: "Vinagre balsámico." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Alterna las rodajas de tomate y mozzarella en un plato.",
+                    "Coloca hojas de albahaca entre las rodajas.",
+                    "Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.",
+                    "Deja reposar unos minutos antes de servir."
+                ],
                 tips: 'Usa tomates de buena calidad y a temperatura ambiente, nunca fríos de la nevera. Sazona los tomates con sal *antes* de añadir la mozzarella.'
             },
             {
@@ -1095,25 +1004,21 @@
                 timeMinutes: 60,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>4 papas medianas.</li>
-                        <li>4 cdas de mantequilla derretida.</li>
-                        <li>2 cdas de romero fresco picado.</li>
-                        <li>1/4 taza de queso cheddar rallado.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Lava las papas y córtalas en rodajas finas sin llegar al fondo.</li>
-                        <li>Precalienta el barril a 204°C.</li>
-                        <li>Coloca las papas en una fuente resistente al fuego.</li>
-                        <li>Mezcla la mantequilla derretida con romero, sal y pimienta. Cepilla sobre las papas.</li>
-                        <li>Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.</li>
-                        <li>Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "4", unit: "", name: "papas medianas." },
+                    { amount: "4", unit: "cdas", name: "de mantequilla derretida." },
+                    { amount: "2", unit: "cdas", name: "de romero fresco picado." },
+                    { amount: "1/4", unit: "taza", name: "de queso cheddar rallado." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Lava las papas y córtalas en rodajas finas sin llegar al fondo.",
+                    "Precalienta el barril a 204°C.",
+                    "Coloca las papas en una fuente resistente al fuego.",
+                    "Mezcla la mantequilla derretida con romero, sal y pimienta. Cepilla sobre las papas.",
+                    "Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.",
+                    "Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita."
+                ],
                 tips: 'Para cortar las papas fácilmente sin llegar al fondo, colócalas entre dos palillos chinos o mangos de cucharas de madera.'
             },
             {
@@ -1125,31 +1030,24 @@
                 timeMinutes: 45,
                 difficulty: 'Media',
                 difficultyValue: 2,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 yucas medianas, peladas y en tiras.</li>
-                        <li>Aceite vegetal para freír.</li>
-                        <li>Sal al gusto.</li>
-                        <li>Para el Mojo:
-                            <ul class="list-disc pl-6">
-                                <li>4 dientes de ajo, picados finamente.</li>
-                                <li>1/2 taza de aceite de oliva.</li>
-                                <li>1/4 taza de jugo de limón.</li>
-                                <li>Sal y pimienta al gusto.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Hierve las tiras de yuca en agua con sal hasta que estén tiernas (20-25 min). Escurre y deja enfriar.</li>
-                        <li>Precalienta el barril a 190°C para freír (o usa sartén con aceite).</li>
-                        <li>Fríe las tiras de yuca hasta que estén doradas y crujientes. Escurre y sazona con sal.</li>
-                        <li>Para el mojo: Calienta aceite de oliva, agrega el ajo y cocina a fuego lento hasta que esté dorado.</li>
-                        <li>Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.</li>
-                        <li>Sirve la yuca caliente con el mojo.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "", name: "yucas medianas, peladas y en tiras." },
+                    { amount: "", unit: "", name: "Aceite vegetal para freír." },
+                    { amount: "", unit: "", name: "Sal al gusto." },
+                    { amount: "", unit: "", name: "Para el Mojo:", isSubheader: true },
+                    { amount: "4", unit: "", name: "dientes de ajo, picados finamente.", isSubItem: true },
+                    { amount: "1/2", unit: "taza", name: "de aceite de oliva.", isSubItem: true },
+                    { amount: "1/4", unit: "taza", name: "de jugo de limón.", isSubItem: true },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto.", isSubItem: true }
+                ],
+                instructions: [
+                    "Hierve las tiras de yuca en agua con sal hasta que estén tiernas (20-25 min). Escurre y deja enfriar.",
+                    "Precalienta el barril a 190°C para freír (o usa sartén con aceite).",
+                    "Fríe las tiras de yuca hasta que estén doradas y crujientes. Escurre y sazona con sal.",
+                    "Para el mojo: Calienta aceite de oliva, agrega el ajo y cocina a fuego lento hasta que esté dorado.",
+                    "Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.",
+                    "Sirve la yuca caliente con el mojo."
+                ],
                 tips: 'Para una yuca extra crujiente, congela las tiras de yuca *después* de hervirlas y enfriarlas. Fríelas directamente desde congeladas.'
             },
             {
@@ -1161,23 +1059,19 @@
                 timeMinutes: 30,
                 difficulty: 'Fácil',
                 difficultyValue: 1,
-                content: `
-                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-                    <ul class="list-disc pl-5 mb-4">
-                        <li>2 yucas medianas, peladas y en trozos.</li>
-                        <li>1/2 taza de queso crema.</li>
-                        <li>1/4 taza de leche caliente.</li>
-                        <li>2 cdas de mantequilla.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-                    <ol class="list-decimal pl-5 space-y-2">
-                        <li>Hierve la yuca en agua con sal hasta que esté tierna (20-25 min). Escurre.</li>
-                        <li>En un tazón, mezcla la yuca, queso crema, leche caliente y mantequilla.</li>
-                        <li>Usa un machacador o procesador para hacer un puré suave.</li>
-                        <li>Sazona con sal y pimienta. Sirve caliente.</li>
-                    </ol>
-                `,
+                ingredients: [
+                    { amount: "2", unit: "", name: "yucas medianas, peladas y en trozos." },
+                    { amount: "1/2", unit: "taza", name: "de queso crema." },
+                    { amount: "1/4", unit: "taza", name: "de leche caliente." },
+                    { amount: "2", unit: "cdas", name: "de mantequilla." },
+                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
+                ],
+                instructions: [
+                    "Hierve la yuca en agua con sal hasta que esté tierna (20-25 min). Escurre.",
+                    "En un tazón, mezcla la yuca, queso crema, leche caliente y mantequilla.",
+                    "Usa un machacador o procesador para hacer un puré suave.",
+                    "Sazona con sal y pimienta. Sirve caliente."
+                ],
                 tips: 'Asegúrate de quitar la hebra central (fibrosa) de la yuca después de hervirla y antes de hacer el puré.'
             }
         ];
@@ -1341,7 +1235,47 @@
                 
                 if (recipe && modalTitle && modalBody && modal) {
                     modalTitle.textContent = recipe.title;
-                    modalBody.innerHTML = recipe.content;
+                    
+                    // ! INICIO: Construcción dinámica de contenido
+                    let modalHTML = '';
+
+                    // 1. Ingredientes
+                    if (recipe.ingredients && recipe.ingredients.length > 0) {
+                        modalHTML += '<h3 class="font-bold text-xl mb-3">Ingredientes:</h3>';
+                        modalHTML += '<ul class="list-disc pl-5 mb-4 space-y-1">';
+                        
+                        let sublistOpen = false;
+                        recipe.ingredients.forEach(ing => {
+                            const itemText = `${ing.amount ? `<strong>${ing.amount}</strong> ` : ''}${ing.unit ? `${ing.unit} ` : ''}${ing.name}`;
+                            
+                            if (ing.isSubheader) {
+                                if (sublistOpen) modalHTML += '</ul></li>'; // Cierra sublista anterior si existe
+                                modalHTML += `<li>${itemText}<ul class="list-disc pl-6 mt-1">`; // Abre nueva sublista
+                                sublistOpen = true;
+                            } else if (ing.isSubItem) {
+                                modalHTML += `<li>${itemText}</li>`; // Item dentro de sublista
+                            } else {
+                                if (sublistOpen) modalHTML += '</ul></li>'; // Cierra sublista anterior
+                                modalHTML += `<li>${itemText}</li>`; // Item normal
+                                sublistOpen = false;
+                            }
+                        });
+                        if (sublistOpen) modalHTML += '</ul></li>'; // Cierra la última sublista
+                        modalHTML += '</ul>';
+                    }
+
+                    // 2. Instrucciones
+                    if (recipe.instructions && recipe.instructions.length > 0) {
+                        modalHTML += '<h3 class="font-bold text-xl mb-3">Instrucciones:</h3>';
+                        modalHTML += '<ol class="list-decimal pl-5 space-y-2">';
+                        recipe.instructions.forEach(step => {
+                            modalHTML += `<li>${step}</li>`;
+                        });
+                        modalHTML += '</ol>';
+                    }
+                    
+                    modalBody.innerHTML = modalHTML;
+                    // ! FIN: Construcción dinámica de contenido
                     
                     // ! Lógica de Tips
                     if (recipe.tips && modalTipsContent && modalTipsText) {
