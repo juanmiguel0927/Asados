@@ -50,6 +50,8 @@
             border: 1px solid #e0d9c4;
             transition: all 0.3s ease;
             cursor: pointer;
+            /* ! Se añade para la lógica de filtrado/búsqueda */
+            display: block; 
         }
         .recipe-card:hover {
             transform: translateY(-5px);
@@ -112,7 +114,7 @@
         ol {
             list-style-type: decimal;
         }
-        /* ! INICIO: Estilos para Filtros */
+        /* Estilos para Filtros */
         .filter-button {
             background-color: #f3f4f6;
             color: #4a2d1f;
@@ -132,7 +134,62 @@
             color: #ffffff;
             border-color: #d97706;
         }
-        /* ! FIN: Estilos para Filtros */
+
+        /* ! INICIO: Nuevos Estilos (Búsqueda, Impresión, Nuevos Datos) */
+        #search-bar {
+            width: 100%;
+            padding: 10px 16px;
+            border: 2px solid #e0d9c4;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #4a2d1f;
+            background-color: #fffbf0;
+        }
+        #search-bar:focus {
+            outline: none;
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px 12px;
+            background-color: #fdfcf9;
+            border-top: 1px solid #f3f0e8;
+            font-size: 0.875rem;
+            color: #785a4b;
+        }
+        #modal-print-btn {
+            background-color: #d97706;
+            color: white;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 24px;
+        }
+        #modal-print-btn:hover {
+            background-color: #b45f06;
+        }
+        /* Estilos de impresión */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+        /* ! FIN: Nuevos Estilos */
+
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -154,13 +211,12 @@
         </nav>
 
         <!-- Contenido de Pestañas -->
-        <!-- ! MODIFICACIÓN: Se añade padding inferior (pb-16) para más espacio vertical -->
         <main class="p-6 md:p-8 pb-16">
 
             <!-- Pestaña de Técnicas -->
             <section id="tecnicas-content" class="tab-content active space-y-4">
                 
-                <!-- Acordeón de Técnicas -->
+                <!-- Acordeón de Técnicas (Sin cambios) -->
                 <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <h3 class="accordion-header flex justify-between items-center p-5">
                         <span class="text-xl font-bold text-amber-700">Cap. 1: Fundamentos de los Asados al Barril</span>
@@ -244,7 +300,6 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!-- ! INICIO: Modificación - Separación de Técnicas -->
                             <li><strong>Cocción Lenta (Indirecta):</strong>
                                 <ul class="list-disc ml-6 mt-1 space-y-2">
                                     <li><strong>Definición:</strong> La carne se coloca lejos del fuego directo. Es la técnica principal para asados al barril (BBQ).</li>
@@ -260,7 +315,6 @@
                                     <li><strong>Tiempos Cortos:</strong> Se usa para filetes (3-5 min por lado), costillas de cordero (3-4 min por lado) o para dorar la carne antes de pasarla a cocción indirecta.</li>
                                 </ul>
                             </li>
-                            <!-- ! FIN: Modificación -->
                             <li><strong>Sabor Ahumado Perfecto:</strong>
                                 <ul class="list-disc ml-6 mt-1 space-y-2">
                                     <li><strong>Selección de Madera:</strong> Nogal (suave), Manzano (frutal), Nogal Americano (fuerte), Mezquite (intenso).</li>
@@ -293,188 +347,52 @@
             <!-- Pestaña de Recetas -->
             <section id="recetas-content" class="tab-content">
                 
-                <!-- ! INICIO: Contenedor de Filtros -->
-                <div id="filter-container" class="flex flex-wrap gap-2 mb-8">
-                    <button class="filter-button active" data-filter="todos">Ver Todo</button>
-                    <button class="filter-button" data-filter="cerdo">🐖 Cerdo</button>
-                    <button class="filter-button" data-filter="res">🐄 Res</button>
-                    <button class="filter-button" data-filter="pollo">🐓 Pollo</button>
-                    <button class="filter-button" data-filter="cordero">🐑 Cordero</button>
-                    <button class="filter-button" data-filter="pavo">🦃 Pavo</button>
-                    <button class="filter-button" data-filter="pescado">🐟 Pescado</button>
-                    <button class="filter-button" data-filter="acompanamiento">🥗 Acompañamiento</button>
+                <!-- ! INICIO: Controles de Búsqueda y Filtro -->
+                <div class="mb-8 space-y-4">
+                    <!-- Barra de Búsqueda -->
+                    <div>
+                        <label for="search-bar" class="block text-sm font-semibold mb-2">Buscar Receta:</label>
+                        <input type="text" id="search-bar" placeholder="Ej: Costillar, Brisket, Papas...">
+                    </div>
+                    
+                    <!-- Contenedor de Filtros -->
+                    <div id="filter-container" class="flex flex-wrap gap-2">
+                        <button class="filter-button active" data-filter="todos">Ver Todo</button>
+                        <button class="filter-button" data-filter="cerdo">🐖 Cerdo</button>
+                        <button class="filter-button" data-filter="res">🐄 Res</button>
+                        <button class="filter-button" data-filter="pollo">🐓 Pollo</button>
+                        <button class="filter-button" data-filter="cordero">🐑 Cordero</button>
+                        <button class="filter-button" data-filter="pavo">🦃 Pavo</button>
+                        <button class="filter-button" data-filter="pescado">🐟 Pescado</button>
+                        <button class="filter-button" data-filter="acompanamiento">🥗 Acompañamiento</button>
+                    </div>
                 </div>
-                <!-- ! FIN: Contenedor de Filtros -->
+                <!-- ! FIN: Controles de Búsqueda y Filtro -->
 
                 <!-- Platos Principales -->
                 <h2 id="header-principales" class="text-3xl font-bold text-amber-800 mb-6 border-b-2 border-amber-300 pb-2">Platos Principales (Cap. 5)</h2>
+                <!-- ! CONTENEDOR VACÍO: Las tarjetas se generarán aquí -->
                 <div id="grid-principales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Tarjetas de Recetas Principales -->
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillar-clasico" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo" alt="Costillar de Cerdo" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Costillar de Cerdo con Sazonado Clásico</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-brisket" data-category="res">
-                        <img src="https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res" alt="Brisket de Res" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Brisket de Res Ahumado</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pollo-citricos" data-category="pollo">
-                        <img src="https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado" alt="Pollo Asado" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Pollo Asado con Marinado de Hierbas y Cítricos</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-cordero-menta" data-category="cordero">
-                        <img src="https://placehold.co/400x200/8c7a6b/ffffff?text=Costillas+de+Cordero" alt="Costillas de Cordero" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Costillas de Cordero con Salsa de Menta</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pavo-arce" data-category="pavo">
-                        <img src="https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo" alt="Pechuga de Pavo" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Pechuga de Pavo Ahumada con Glaseado de Arce y Mostaza</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-miel-mostaza" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza" alt="Costillas Miel Mostaza" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Costillas de Cerdo con Glaseado de Miel y Mostaza</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-coreanas" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas" alt="Costillas Coreanas" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Costillas de Cerdo Coreanas a la Parrilla</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-costillas-ciruela" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela" alt="Costillas con Ciruela" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Costillas de Cerdo con Salsa de Ciruela</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-crujiente" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente" alt="Chicharrón Crujiente" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Chicharrón al Barril Crujiente</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-chicharron-limon" data-category="cerdo">
-                        <img src="https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile" alt="Chicharrón Limón y Chile" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Chicharrón al Barril con Sabor a Limón y Chile</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-limon" data-category="pescado">
-                        <img src="https://placehold.co/400x200/bde0fe/4a2d1f?text=Pescado+al+Barril" alt="Pescado al Barril" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Pescado al Barril con Salsa de Hierbas y Limón</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pescado-mantequilla" data-category="pescado">
-                        <img src="https://placehold.co/400x200/cddfa0/4a2d1f?text=Pescado+con+Mantequilla" alt="Pescado con Mantequilla" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Pescado al Barril con Salsa de Mantequilla y Hierbas</h3>
-                        </div>
-                    </div>
-
+                    <!-- Las tarjetas de recetas principales se inyectarán aquí dinámicamente -->
                 </div>
 
                 <!-- Acompañamientos y Salsas -->
                 <h2 id="header-acompanamientos" class="text-3xl font-bold text-amber-800 mt-12 mb-6 border-b-2 border-amber-300 pb-2">Acompañamientos y Salsas (Cap. 6)</h2>
+                <!-- ! CONTENEDOR VACÍO: Las tarjetas se generarán aquí -->
                 <div id="grid-acompanamientos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Tarjetas de Recetas Acompañamientos -->
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-ahumado" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/f0e6d2/4a2d1f?text=Puré+de+Papas+Ahumado" alt="Puré de Papas Ahumado" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Puré de Papas Ahumadas</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-col" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/55a630/ffffff?text=Ensalada+de+Col+Rizada" alt="Ensalada de Col Rizada" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Ensalada de Col Rizada con Vinagreta</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-salsa-bbq" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/8f250c/ffffff?text=Salsa+Barbacoa" alt="Salsa Barbacoa" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Salsa Barbacoa Casera</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-maiz-parrilla" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/fde047/4a2d1f?text=Maíz+a+la+Parrilla" alt="Maíz a la Parrilla" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Maíz a la Parrilla con Mantequilla de Hierbas</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-esparragos" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/84cc16/ffffff?text=Espárragos" alt="Espárragos" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Espárragos a la Parrilla con Limón y Parmesano</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-ensalada-tomate" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/ef4444/ffffff?text=Ensalada+Tomate+Mozzarella" alt="Ensalada Tomate Mozzarella" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Ensalada de Tomate y Mozzarella con Albahaca</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-papas-hasselback" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/f5cb5c/4a2d1f?text=Papas+Hasselback" alt="Papas Hasselback" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Papas Hasselback con Hierbas y Queso</h3>
-                        </div>
-                    </div>
-
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-yuca-frita" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/ffe8d6/4a2d1f?text=Yuca+Frita+con+Mojo" alt="Yuca Frita con Mojo" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Yuca Frita con Mojo</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="receta-pure-yuca" data-category="acompanamiento">
-                        <img src="https://placehold.co/400x200/fff4e6/4a2d1f?text=Puré+de+Yuca" alt="Puré de Yuca" class="w-full h-40 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold">Puré de Yuca con Queso</h3>
-                        </div>
-                    </div>
-
+                    <!-- Las tarjetas de recetas de acompañamiento se inyectarán aquí dinámicamente -->
                 </div>
+
+                <!-- Mensaje de no resultados -->
+                <p id="no-results" class="text-center text-gray-500 text-lg mt-10" style="display: none;">No se encontraron recetas que coincidan con tu búsqueda.</p>
 
             </section>
         </main>
 
-        <!-- ! INICIO: Footer con Créditos -->
+        <!-- Footer con Créditos -->
         <footer class="p-6 text-center text-sm text-gray-500 border-t border-gray-300 bg-gray-50">
             <p>Créditos: Juan Miguel Rios Redondo</p>
         </footer>
-        <!-- ! FIN: Footer con Créditos -->
 
     </div>
 
@@ -483,530 +401,702 @@
         <div id="modal-content">
             <span id="modal-close">&times;</span>
             <h2 id="modal-title" class="text-3xl font-bold mb-4 text-amber-800"></h2>
-            <div id="modal-body" class="space-y-4 text-base">
-                <!-- El contenido de la receta se inyectará aquí -->
+            <!-- ! Contenedor para el área imprimible -->
+            <div id="modal-body-printable">
+                <div id="modal-body" class="space-y-4 text-base">
+                    <!-- El contenido de la receta se inyectará aquí -->
+                </div>
             </div>
+            <!-- ! Botón de Imprimir -->
+            <button id="modal-print-btn">Imprimir Receta</button>
         </div>
     </div>
 
 
-    <!-- Base de datos de recetas (oculta) -->
-    <div id="recipe-database" class="hidden">
-
-        <!-- PRINCIPALES -->
-        <div id="receta-costillar-clasico">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 costillar de cerdo (aprox. 2 kg).</li>
-                <li>Sazonado Clásico (Cap. 2):
-                    <ul class="list-disc pl-6">
-                        <li>2 cdas de sal</li>
-                        <li>2 cdas de pimienta negra</li>
-                        <li>1 cda de paprika</li>
-                        <li>1 cda de azúcar moreno</li>
-                        <li>1 cdta de ajo en polvo</li>
-                        <li>1 cdta de cebolla en polvo</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca el costillar.</li>
-                <li>Aplica generosamente el sazonado clásico por toda la superficie.</li>
-                <li>Precalienta el barril a 121°C.</li>
-                <li>Coloca el costillar en la zona indirecta.</li>
-                <li>Cocina por 3-4 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
-                <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                <li>Retira, deja reposar 15 minutos y corta.</li>
-            </ol>
-        </div>
-
-        <div id="receta-brisket">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 brisket de res (4-5 kg).</li>
-                <li>Sazonado Ahumado (Cap. 2):
-                    <ul class="list-disc pl-6">
-                        <li>3 cdas de sal ahumada</li>
-                        <li>2 cdas de pimienta negra</li>
-                        <li>1 cda de pimentón ahumado</li>
-                        <li>1 cda de ajo en polvo</li>
-                        <li>1 cda de cebolla en polvo</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca el brisket.</li>
-                <li>Aplica el sazonado ahumado por todas las superficies.</li>
-                <li>Precalienta el barril a 107°C.</li>
-                <li>Coloca el brisket en la zona indirecta, con la grasa hacia arriba.</li>
-                <li>Cocina por 10-12 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
-                <li>Verifica que la temperatura interna alcance los 88-93°C.</li>
-                <li>Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar.</li>
-            </ol>
-        </div>
-
-        <div id="receta-pollo-citricos">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 pollo entero (aprox. 2 kg).</li>
-                <li>Marinado de Hierbas y Cítricos (Cap. 3):
-                    <ul class="list-disc pl-6">
-                        <li>1/2 taza de jugo de limón fresco</li>
-                        <li>1/4 de taza de aceite de oliva</li>
-                        <li>2 cdas de romero fresco picado</li>
-                        <li>2 cdas de tomillo fresco picado</li>
-                        <li>3 dientes de ajo picados</li>
-                        <li>Sal y pimienta al gusto</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca el pollo.</li>
-                <li>Prepara el marinado.</li>
-                <li>Coloca el pollo y el marinado en una bolsa o recipiente. Refrigera por 2-4 horas.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca el pollo en la zona indirecta y cocina por 1-1.5 horas, volteando ocasionalmente.</li>
-                <li>Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.</li>
-                <li>Retira y deja reposar 10 minutos antes de cortar.</li>
-            </ol>
-        </div>
-
-        <div id="receta-cordero-menta">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 costillas de cordero (aprox. 200-250 g c/u).</li>
-                <li>Salsa de Menta (Basada en Adobo de Yogur y Hierbas Cap. 3):
-                    <ul class="list-disc pl-6">
-                        <li>1 taza de yogur natural</li>
-                        <li>2 cdas de menta fresca picada</li>
-                        <li>2 cdas de cilantro fresco picado</li>
-                        <li>1 cdta de comino molido</li>
-                        <li>1 cdta de paprika</li>
-                        <li>Sal y pimienta al gusto</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca las costillas.</li>
-                <li>Prepara la salsa/adobo de menta.</li>
-                <li>Aplica una capa generosa sobre las costillas y marina por al menos 30 minutos.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca las costillas en la zona directa y cocina 3-4 minutos por lado (para dorar).</li>
-                <li>Mueve a la zona indirecta y continúa cocinando 8-10 minutos, volteando y cepillando con más salsa.</li>
-                <li>Verifica que la temperatura interna alcance los 63-71°C (punto medio).</li>
-                <li>Sirve con más salsa por encima.</li>
-            </ol>
-        </div>
-
-        <div id="receta-pavo-arce">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 pechuga de pavo (aprox. 2 kg).</li>
-                <li>Glaseado de Arce y Mostaza (No está en Cap. 3, asumiendo receta estándar):
-                    <ul class="list-disc pl-6">
-                        <li>1/2 taza de sirope de arce</li>
-                        <li>1/4 taza de mostaza Dijon</li>
-                        <li>1 cda de aceite de oliva</li>
-                        <li>1 cdta de paprika</li>
-                        <li>Sal y pimienta al gusto</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca la pechuga de pavo.</li>
-                <li>Prepara el glaseado mezclando los ingredientes.</li>
-                <li>Aplica el glaseado sobre la pechuga uniformemente.</li>
-                <li>Precalienta el barril a 149°C.</li>
-                <li>Coloca la pechuga en la zona indirecta.</li>
-                <li>Cocina por 2-3 horas, aplicando más glaseado regularmente.</li>
-                <li>Verifica que la temperatura interna alcance los 74-79°C.</li>
-                <li>Retira, deja reposar 10 minutos y rebana.</li>
-            </ol>
-        </div>
-
-        <div id="receta-costillas-miel-mostaza">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                <li>1/2 taza de miel.</li>
-                <li>1/4 taza de mostaza Dijon.</li>
-                <li>2 cdas de salsa de soja.</li>
-                <li>2 cdta de pimentón ahumado.</li>
-                <li>1 cdta de ajo en polvo.</li>
-                <li>1 cdta de cebolla en polvo.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca las costillas.</li>
-                <li>Mezcla miel, mostaza, soja, pimentón, ajo en polvo y cebolla en polvo para el glaseado.</li>
-                <li>Aplica una capa generosa de glaseado y sazona con sal y pimienta.</li>
-                <li>Precalienta el barril a 149°C.</li>
-                <li>Coloca las costillas en la zona indirecta y cocina 2-3 horas, volteando y aplicando más glaseado cada 30 minutos.</li>
-                <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                <li>Retira, corta y sirve con más glaseado.</li>
-            </ol>
-        </div>
-
-        <div id="receta-costillas-coreanas">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                <li>1/2 taza de salsa de soja.</li>
-                <li>1/4 taza de azúcar moreno.</li>
-                <li>2 cdas de aceite de sésamo.</li>
-                <li>2 cdas de cebolla verde picada.</li>
-                <li>2 dientes de ajo picados.</li>
-                <li>1 cdta de jengibre fresco rallado.</li>
-                <li>1/2 cdta de pimienta negra.</li>
-                <li>Semillas de sésamo tostado para decorar.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca las costillas.</li>
-                <li>Mezcla soja, azúcar, aceite de sésamo, cebolla verde, ajo, jengibre y pimienta para el marinado.</li>
-                <li>Marbina las costillas en refrigeración por al menos 4 horas o toda la noche.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca las costillas en la zona indirecta y cocina 1-1.5 horas, volteando y aplicando más marinado cada 20 minutos.</li>
-                <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                <li>Retira, espolvorea con semillas de sésamo y sirve.</li>
-            </ol>
-        </div>
-
-        <div id="receta-costillas-ciruela">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
-                <li>1 taza de salsa de ciruela.</li>
-                <li>1/4 taza de salsa de soja.</li>
-                <li>2 cdas de miel.</li>
-                <li>2 cdta de jengibre fresco rallado.</li>
-                <li>1 cdta de ajo picado.</li>
-                <li>1/2 cdta de pimienta roja triturada (opcional).</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca las costillas.</li>
-                <li>Mezcla salsa de ciruela, soja, miel, jengibre, ajo y pimienta roja (si se usa).</li>
-                <li>Aplica la mezcla sobre las costillas y marina al menos 1 hora en refrigeración.</li>
-                <li>Precalienta el barril a 149°C.</li>
-                <li>Coloca las costillas en la zona indirecta y cocina 2-2.5 horas, volteando y aplicando más salsa cada 30 minutos.</li>
-                <li>Verifica que la temperatura interna alcance los 71°C.</li>
-                <li>Retira, corta y sirve con más salsa.</li>
-            </ol>
-        </div>
-
-        <div id="receta-chicharron-crujiente">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 kg de piel de cerdo, cortada en trozos pequeños.</li>
-                <li>2 cdas de sal gruesa.</li>
-                <li>1 cdta de pimienta negra molida.</li>
-                <li>1 cdta de pimentón ahumado.</li>
-                <li>Aceite vegetal para freír.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca cuidadosamente la piel de cerdo.</li>
-                <li>Mezcla sal, pimienta y pimentón ahumado.</li>
-                <li>Espolvorea y frota las especias sobre la piel.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca la piel en la zona indirecta y cocina 1-2 horas hasta que esté crujiente y dorada, girando ocasionalmente.</li>
-                <li>Retira y escurre sobre papel absorbente.</li>
-                <li>Calienta aceite vegetal en una sartén grande a 180°C.</li>
-                <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
-                <li>Escurre el exceso de aceite y sirve caliente.</li>
-            </ol>
-        </div>
-
-        <div id="receta-chicharron-limon">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 kg de piel de cerdo, cortada en tiras delgadas.</li>
-                <li>2 limones (jugo y ralladura).</li>
-                <li>2 cdas de sal.</li>
-                <li>1 cda de chile en polvo.</li>
-                <li>1 cdta de ajo en polvo.</li>
-                <li>1 cdta de comino molido.</li>
-                <li>Aceite vegetal para freír.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y seca las tiras de piel.</li>
-                <li>Mezcla jugo y ralladura de limón, sal, chile en polvo, ajo en polvo y comino.</li>
-                <li>Marina la piel en la mezcla por al menos 30 minutos en refrigeración.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca las tiras en la zona indirecta y cocina 1-2 horas hasta que estén crujientes y doradas, girando ocasionalmente.</li>
-                <li>Retira y escurre sobre papel absorbente.</li>
-                <li>Calienta aceite vegetal a 180°C.</li>
-                <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
-                <li>Escurre el exceso de aceite y sirve caliente con rodajas de limón.</li>
-            </ol>
-        </div>
-
-        <div id="receta-pescado-limon">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 filetes de pescado (aprox. 150 g c/u), como lubina o trucha.</li>
-                <li>2 limones (jugo y ralladura).</li>
-                <li>3 cdas de aceite de oliva.</li>
-                <li>2 dientes de ajo, picados.</li>
-                <li>2 cdas de perejil fresco picado.</li>
-                <li>1 cdta de tomillo fresco.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Mezcla jugo y ralladura de limón, aceite de oliva, ajo, perejil, tomillo, sal y pimienta.</li>
-                <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
-                <li>Sirve con un poco de la salsa por encima.</li>
-            </ol>
-        </div>
-
-        <div id="receta-pescado-mantequilla">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 filetes de pescado (aprox. 150 g c/u), como salmón o trucha.</li>
-                <li>1/2 taza (115 g) de mantequilla derretida.</li>
-                <li>2 cdas de perejil fresco picado.</li>
-                <li>2 cdas de cilantro fresco picado.</li>
-                <li>1 cda de estragón fresco picado.</li>
-                <li>2 cdta de jugo de limón.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Mezcla mantequilla derretida, perejil, cilantro, estragón, jugo de limón, sal y pimienta.</li>
-                <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
-                <li>Precalienta el barril a 177°C.</li>
-                <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
-                <li>Sirve con un poco de la salsa por encima.</li>
-            </ol>
-        </div>
-
-
-        <!-- ACOMPAÑAMIENTOS -->
-        <div id="receta-pure-ahumado">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 papas grandes, peladas y en cubos.</li>
-                <li>1/2 taza de leche caliente.</li>
-                <li>2 cdas de mantequilla.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Cocina las papas en agua con sal hasta que estén tiernas. Escúrrelas.</li>
-                <li>Precalienta el barril a baja temperatura y agrega astillas de madera de manzana.</li>
-                <li>Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.</li>
-                <li>Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave.</li>
-            </ol>
-        </div>
-
-        <div id="receta-ensalada-col">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 tazas de col rizada, lavada y picada.</li>
-                <li>1/4 taza de pasas.</li>
-                <li>1/4 taza de nueces tostadas.</li>
-                <li>Para la vinagreta:
-                    <ul class="list-disc pl-6">
-                        <li>2 cdas de aceite de oliva.</li>
-                        <li>1 cda de vinagre de sidra de manzana.</li>
-                        <li>1 cda de mostaza Dijon.</li>
-                        <li>1 cda de miel.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>En un tazón grande, combina la col rizada, pasas y nueces.</li>
-                <li>En otro tazón, mezcla los ingredientes de la vinagreta.</li>
-                <li>Vierte la vinagreta sobre la ensalada y mezcla bien.</li>
-            </ol>
-        </div>
-
-        <div id="receta-salsa-bbq">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 taza de kétchup.</li>
-                <li>1/4 taza de vinagre de sidra de manzana.</li>
-                <li>2 cdas de azúcar moreno.</li>
-                <li>1 cda de mostaza Dijon.</li>
-                <li>1 cdta de salsa Worcestershire.</li>
-                <li>1 cdta de pimentón ahumado.</li>
-                <li>1/2 cdta de ajo en polvo.</li>
-                <li>1/2 cdta de cebolla en polvo.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Combina todos los ingredientes en una cacerola a fuego medio.</li>
-                <li>Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.</li>
-                <li>Deja enfriar antes de usar.</li>
-            </ol>
-        </div>
-        
-        <div id="receta-maiz-parrilla">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 mazorcas de maíz, con hojas.</li>
-                <li>4 cdas de mantequilla derretida.</li>
-                <li>2 cdas de perejil fresco picado.</li>
-                <li>2 cdas de cebollín fresco picado.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Remoja las mazorcas en agua por al menos 30 minutos.</li>
-                <li>Precalienta el barril a temperatura media-alta.</li>
-                <li>Asa las mazorcas directamente en la parrilla, girando, por 10-15 minutos o hasta que estén tiernas y doradas.</li>
-                <li>Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.</li>
-                <li>Cepilla el maíz con la mantequilla de hierbas antes de servir.</li>
-            </ol>
-        </div>
-        
-        <div id="receta-esparragos">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>1 manojo de espárragos frescos.</li>
-                <li>2 cdas de aceite de oliva.</li>
-                <li>1 limón (jugo y ralladura).</li>
-                <li>1/4 taza de queso parmesano rallado.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava y recorta los extremos leñosos de los espárragos.</li>
-                <li>Mezcla aceite de oliva, jugo y ralladura de limón, parmesano, sal y pimienta.</li>
-                <li>Cepilla los espárragos con esta mezcla.</li>
-                <li>Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.</li>
-                <li>Sirve con más ralladura de limón y parmesano.</li>
-            </ol>
-        </div>
-        
-        <div id="receta-ensalada-tomate">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 tomates medianos, en rodajas.</li>
-                <li>200 g de queso mozzarella fresco, en rodajas.</li>
-                <li>Hojas frescas de albahaca.</li>
-                <li>2 cdas de aceite de oliva virgen extra.</li>
-                <li>Vinagre balsámico.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Alterna las rodajas de tomate y mozzarella en un plato.</li>
-                <li>Coloca hojas de albahaca entre las rodajas.</li>
-                <li>Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.</li>
-                <li>Deja reposar unos minutos antes de servir.</li>
-            </ol>
-        </div>
-        
-        <div id="receta-papas-hasselback">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>4 papas medianas.</li>
-                <li>4 cdas de mantequilla derretida.</li>
-                <li>2 cdas de romero fresco picado.</li>
-                <li>1/4 taza de queso cheddar rallado.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Lava las papas y córtalas en rodajas finas sin llegar al fondo.</li>
-                <li>Precalienta el barril a 204°C.</li>
-                <li>Coloca las papas en una fuente resistente al fuego.</li>
-                <li>Mezcla la mantequilla derretida con romero, sal y pimienta. Cepilla sobre las papas.</li>
-                <li>Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.</li>
-                <li>Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita.</li>
-            </ol>
-        </div>
-        
-        <div id="receta-yuca-frita">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 yucas medianas, peladas y en tiras.</li>
-                <li>Aceite vegetal para freír.</li>
-                <li>Sal al gusto.</li>
-                <li>Para el Mojo:
-                    <ul class="list-disc pl-6">
-                        <li>4 dientes de ajo, picados finamente.</li>
-                        <li>1/2 taza de aceite de oliva.</li>
-                        <li>1/4 taza de jugo de limón.</li>
-                        <li>Sal y pimienta al gusto.</li>
-                    </ul>
-                </li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Hierve las tiras de yuca en agua con sal hasta que estén tiernas (20-25 min). Escurre y deja enfriar.</li>
-                <li>Precalienta el barril a 190°C para freír (o usa sartén con aceite).</li>
-                <li>Fríe las tiras de yuca hasta que estén doradas y crujientes. Escurre y sazona con sal.</li>
-                <li>Para el mojo: Calienta aceite de oliva, agrega el ajo y cocina a fuego lento hasta que esté dorado.</li>
-                <li>Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.</li>
-                <li>Sirve la yuca caliente con el mojo.</li>
-            </ol>
-        </div>
-
-        <div id="receta-pure-yuca">
-            <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
-            <ul class="list-disc pl-5 mb-4">
-                <li>2 yucas medianas, peladas y en trozos.</li>
-                <li>1/2 taza de queso crema.</li>
-                <li>1/4 taza de leche caliente.</li>
-                <li>2 cdas de mantequilla.</li>
-                <li>Sal y pimienta al gusto.</li>
-            </ul>
-            <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Hierve la yuca en agua con sal hasta que esté tierna (20-25 min). Escurre.</li>
-                <li>En un tazón, mezcla la yuca, queso crema, leche caliente y mantequilla.</li>
-                <li>Usa un machacador o procesador para hacer un puré suave.</li>
-                <li>Sazona con sal y pimienta. Sirve caliente.</li>
-            </ol>
-        </div>
-
-    </div>
-
+    <!-- ! INICIO: Base de datos de recetas en JSON y Lógica de la App -->
     <script>
+        // --- INICIO: Base de Datos de Recetas (JSON) ---
+        const recipeData = [
+            // --- PLATOS PRINCIPALES ---
+            {
+                id: 'receta-costillar-clasico',
+                title: 'Costillar de Cerdo con Sazonado Clásico',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo',
+                time: '3-4 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 costillar de cerdo (aprox. 2 kg).</li>
+                        <li>Sazonado Clásico (Cap. 2):
+                            <ul class="list-disc pl-6">
+                                <li>2 cdas de sal</li>
+                                <li>2 cdas de pimienta negra</li>
+                                <li>1 cda de paprika</li>
+                                <li>1 cda de azúcar moreno</li>
+                                <li>1 cdta de ajo en polvo</li>
+                                <li>1 cdta de cebolla en polvo</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca el costillar.</li>
+                        <li>Aplica generosamente el sazonado clásico por toda la superficie.</li>
+                        <li>Precalienta el barril a 121°C.</li>
+                        <li>Coloca el costillar en la zona indirecta.</li>
+                        <li>Cocina por 3-4 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
+                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
+                        <li>Retira, deja reposar 15 minutos y corta.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-brisket',
+                title: 'Brisket de Res Ahumado',
+                category: 'res',
+                image: 'https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res',
+                time: '10-12 horas',
+                difficulty: 'Difícil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 brisket de res (4-5 kg).</li>
+                        <li>Sazonado Ahumado (Cap. 2):
+                            <ul class="list-disc pl-6">
+                                <li>3 cdas de sal ahumada</li>
+                                <li>2 cdas de pimienta negra</li>
+                                <li>1 cda de pimentón ahumado</li>
+                                <li>1 cda de ajo en polvo</li>
+                                <li>1 cda de cebolla en polvo</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca el brisket.</li>
+                        <li>Aplica el sazonado ahumado por todas las superficies.</li>
+                        <li>Precalienta el barril a 107°C.</li>
+                        <li>Coloca el brisket en la zona indirecta, con la grasa hacia arriba.</li>
+                        <li>Cocina por 10-12 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.</li>
+                        <li>Verifica que la temperatura interna alcance los 88-93°C.</li>
+                        <li>Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-pollo-citricos',
+                title: 'Pollo Asado con Marinado de Hierbas y Cítricos',
+                category: 'pollo',
+                image: 'https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado',
+                time: '1.5-2 horas',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 pollo entero (aprox. 2 kg).</li>
+                        <li>Marinado de Hierbas y Cítricos (Cap. 3):
+                            <ul class="list-disc pl-6">
+                                <li>1/2 taza de jugo de limón fresco</li>
+                                <li>1/4 de taza de aceite de oliva</li>
+                                <li>2 cdas de romero fresco picado</li>
+                                <li>2 cdas de tomillo fresco picado</li>
+                                <li>3 dientes de ajo picados</li>
+                                <li>Sal y pimienta al gusto</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca el pollo.</li>
+                        <li>Prepara el marinado.</li>
+                        <li>Coloca el pollo y el marinado en una bolsa o recipiente. Refrigera por 2-4 horas.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca el pollo en la zona indirecta y cocina por 1-1.5 horas, volteando ocasionalmente.</li>
+                        <li>Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.</li>
+                        <li>Retira y deja reposar 10 minutos antes de cortar.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-cordero-menta',
+                title: 'Costillas de Cordero con Salsa de Menta',
+                category: 'cordero',
+                image: 'https://placehold.co/400x200/8c7a6b/ffffff?text=Costillas+de+Cordero',
+                time: '20-30 min',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 costillas de cordero (aprox. 200-250 g c/u).</li>
+                        <li>Salsa de Menta (Basada en Adobo de Yogur y Hierbas Cap. 3):
+                            <ul class="list-disc pl-6">
+                                <li>1 taza de yogur natural</li>
+                                <li>2 cdas de menta fresca picada</li>
+                                <li>2 cdas de cilantro fresco picado</li>
+                                <li>1 cdta de comino molido</li>
+                                <li>1 cdta de paprika</li>
+                                <li>Sal y pimienta al gusto</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca las costillas.</li>
+                        <li>Prepara la salsa/adobo de menta.</li>
+                        <li>Aplica una capa generosa sobre las costillas y marina por al menos 30 minutos.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca las costillas en la zona directa y cocina 3-4 minutos por lado (para dorar).</li>
+                        <li>Mueve a la zona indirecta y continúa cocinando 8-10 minutos, volteando y cepillando con más salsa.</li>
+                        <li>Verifica que la temperatura interna alcance los 63-71°C (punto medio).</li>
+                        <li>Sirve con más salsa por encima.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-pavo-arce',
+                title: 'Pechuga de Pavo Ahumada con Glaseado de Arce y Mostaza',
+                category: 'pavo',
+                image: 'https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo',
+                time: '2-3 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 pechuga de pavo (aprox. 2 kg).</li>
+                        <li>Glaseado de Arce y Mostaza (No está en Cap. 3, asumiendo receta estándar):
+                            <ul class="list-disc pl-6">
+                                <li>1/2 taza de sirope de arce</li>
+                                <li>1/4 taza de mostaza Dijon</li>
+                                <li>1 cda de aceite de oliva</li>
+                                <li>1 cdta de paprika</li>
+                                <li>Sal y pimienta al gusto</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca la pechuga de pavo.</li>
+                        <li>Prepara el glaseado mezclando los ingredientes.</li>
+                        <li>Aplica el glaseado sobre la pechuga uniformemente.</li>
+                        <li>Precalienta el barril a 149°C.</li>
+                        <li>Coloca la pechuga en la zona indirecta.</li>
+                        <li>Cocina por 2-3 horas, aplicando más glaseado regularmente.</li>
+                        <li>Verifica que la temperatura interna alcance los 74-79°C.</li>
+                        <li>Retira, deja reposar 10 minutos y rebana.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-costillas-miel-mostaza',
+                title: 'Costillas de Cerdo con Glaseado de Miel y Mostaza',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza',
+                time: '2-3 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
+                        <li>1/2 taza de miel.</li>
+                        <li>1/4 taza de mostaza Dijon.</li>
+                        <li>2 cdas de salsa de soja.</li>
+                        <li>2 cdta de pimentón ahumado.</li>
+                        <li>1 cdta de ajo en polvo.</li>
+                        <li>1 cdta de cebolla en polvo.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca las costillas.</li>
+                        <li>Mezcla miel, mostaza, soja, pimentón, ajo en polvo y cebolla en polvo para el glaseado.</li>
+                        <li>Aplica una capa generosa de glaseado y sazona con sal y pimienta.</li>
+                        <li>Precalienta el barril a 149°C.</li>
+                        <li>Coloca las costillas en la zona indirecta y cocina 2-3 horas, volteando y aplicando más glaseado cada 30 minutos.</li>
+                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
+                        <li>Retira, corta y sirve con más glaseado.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-costillas-coreanas',
+                title: 'Costillas de Cerdo Coreanas a la Parrilla',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas',
+                time: '1.5-2 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
+                        <li>1/2 taza de salsa de soja.</li>
+                        <li>1/4 taza de azúcar moreno.</li>
+                        <li>2 cdas de aceite de sésamo.</li>
+                        <li>2 cdas de cebolla verde picada.</li>
+                        <li>2 dientes de ajo picados.</li>
+                        <li>1 cdta de jengibre fresco rallado.</li>
+                        <li>1/2 cdta de pimienta negra.</li>
+                        <li>Semillas de sésamo tostado para decorar.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca las costillas.</li>
+                        <li>Mezcla soja, azúcar, aceite de sésamo, cebolla verde, ajo, jengibre y pimienta para el marinado.</li>
+                        <li>Marbina las costillas en refrigeración por al menos 4 horas o toda la noche.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca las costillas en la zona indirecta y cocina 1-1.5 horas, volteando y aplicando más marinado cada 20 minutos.</li>
+                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
+                        <li>Retira, espolvorea con semillas de sésamo y sirve.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-costillas-ciruela',
+                title: 'Costillas de Cerdo con Salsa de Ciruela',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela',
+                time: '2-2.5 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 racks de costillas de cerdo (aprox. 1.5 kg c/u).</li>
+                        <li>1 taza de salsa de ciruela.</li>
+                        <li>1/4 taza de salsa de soja.</li>
+                        <li>2 cdas de miel.</li>
+                        <li>2 cdta de jengibre fresco rallado.</li>
+                        <li>1 cdta de ajo picado.</li>
+                        <li>1/2 cdta de pimienta roja triturada (opcional).</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca las costillas.</li>
+                        <li>Mezcla salsa de ciruela, soja, miel, jengibre, ajo y pimienta roja (si se usa).</li>
+                        <li>Aplica la mezcla sobre las costillas y marina al menos 1 hora en refrigeración.</li>
+                        <li>Precalienta el barril a 149°C.</li>
+                        <li>Coloca las costillas en la zona indirecta y cocina 2-2.5 horas, volteando y aplicando más salsa cada 30 minutos.</li>
+                        <li>Verifica que la temperatura interna alcance los 71°C.</li>
+                        <li>Retira, corta y sirve con más salsa.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-chicharron-crujiente',
+                title: 'Chicharrón al Barril Crujiente',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente',
+                time: '1-2 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 kg de piel de cerdo, cortada en trozos pequeños.</li>
+                        <li>2 cdas de sal gruesa.</li>
+                        <li>1 cdta de pimienta negra molida.</li>
+                        <li>1 cdta de pimentón ahumado.</li>
+                        <li>Aceite vegetal para freír.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca cuidadosamente la piel de cerdo.</li>
+                        <li>Mezcla sal, pimienta y pimentón ahumado.</li>
+                        <li>Espolvorea y frota las especias sobre la piel.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca la piel en la zona indirecta y cocina 1-2 horas hasta que esté crujiente y dorada, girando ocasionalmente.</li>
+                        <li>Retira y escurre sobre papel absorbente.</li>
+                        <li>Calienta aceite vegetal en una sartén grande a 180°C.</li>
+                        <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
+                        <li>Escurre el exceso de aceite y sirve caliente.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-chicharron-limon',
+                title: 'Chicharrón al Barril con Sabor a Limón y Chile',
+                category: 'cerdo',
+                image: 'https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile',
+                time: '1-2 horas',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 kg de piel de cerdo, cortada en tiras delgadas.</li>
+                        <li>2 limones (jugo y ralladura).</li>
+                        <li>2 cdas de sal.</li>
+                        <li>1 cda de chile en polvo.</li>
+                        <li>1 cdta de ajo en polvo.</li>
+                        <li>1 cdta de comino molido.</li>
+                        <li>Aceite vegetal para freír.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y seca las tiras de piel.</li>
+                        <li>Mezcla jugo y ralladura de limón, sal, chile en polvo, ajo en polvo y comino.</li>
+                        <li>Marina la piel en la mezcla por al menos 30 minutos en refrigeración.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca las tiras en la zona indirecta y cocina 1-2 horas hasta que estén crujientes y doradas, girando ocasionalmente.</li>
+                        <li>Retira y escurre sobre papel absorbente.</li>
+                        <li>Calienta aceite vegetal a 180°C.</li>
+                        <li>Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.</li>
+                        <li>Escurre el exceso de aceite y sirve caliente con rodajas de limón.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-pescado-limon',
+                title: 'Pescado al Barril con Salsa de Hierbas y Limón',
+                category: 'pescado',
+                image: 'https://placehold.co/400x200/bde0fe/4a2d1f?text=Pescado+al+Barril',
+                time: '15-20 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 filetes de pescado (aprox. 150 g c/u), como lubina o trucha.</li>
+                        <li>2 limones (jugo y ralladura).</li>
+                        <li>3 cdas de aceite de oliva.</li>
+                        <li>2 dientes de ajo, picados.</li>
+                        <li>2 cdas de perejil fresco picado.</li>
+                        <li>1 cdta de tomillo fresco.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Mezcla jugo y ralladura de limón, aceite de oliva, ajo, perejil, tomillo, sal y pimienta.</li>
+                        <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
+                        <li>Sirve con un poco de la salsa por encima.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-pescado-mantequilla',
+                title: 'Pescado al Barril con Salsa de Mantequilla y Hierbas',
+                category: 'pescado',
+                image: 'https://placehold.co/400x200/cddfa0/4a2d1f?text=Pescado+con+Mantequilla',
+                time: '15-20 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 filetes de pescado (aprox. 150 g c/u), como salmón o trucha.</li>
+                        <li>1/2 taza (115 g) de mantequilla derretida.</li>
+                        <li>2 cdas de perejil fresco picado.</li>
+                        <li>2 cdas de cilantro fresco picado.</li>
+                        <li>1 cda de estragón fresco picado.</li>
+                        <li>2 cdta de jugo de limón.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Mezcla mantequilla derretida, perejil, cilantro, estragón, jugo de limón, sal y pimienta.</li>
+                        <li>Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.</li>
+                        <li>Precalienta el barril a 177°C.</li>
+                        <li>Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.</li>
+                        <li>Sirve con un poco de la salsa por encima.</li>
+                    </ol>
+                `
+            },
+
+            // --- ACOMPAÑAMIENTOS ---
+            {
+                id: 'receta-pure-ahumado',
+                title: 'Puré de Papas Ahumadas',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/f0e6d2/4a2d1f?text=Puré+de+Papas+Ahumado',
+                time: '45 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 papas grandes, peladas y en cubos.</li>
+                        <li>1/2 taza de leche caliente.</li>
+                        <li>2 cdas de mantequilla.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Cocina las papas en agua con sal hasta que estén tiernas. Escúrrelas.</li>
+                        <li>Precalienta el barril a baja temperatura y agrega astillas de madera de manzana.</li>
+                        <li>Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.</li>
+                        <li>Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-ensalada-col',
+                title: 'Ensalada de Col Rizada con Vinagreta',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/55a630/ffffff?text=Ensalada+de+Col+Rizada',
+                time: '10 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 tazas de col rizada, lavada y picada.</li>
+                        <li>1/4 taza de pasas.</li>
+                        <li>1/4 taza de nueces tostadas.</li>
+                        <li>Para la vinagreta:
+                            <ul class="list-disc pl-6">
+                                <li>2 cdas de aceite de oliva.</li>
+                                <li>1 cda de vinagre de sidra de manzana.</li>
+                                <li>1 cda de mostaza Dijon.</li>
+                                <li>1 cda de miel.</li>
+                                <li>Sal y pimienta al gusto.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>En un tazón grande, combina la col rizada, pasas y nueces.</li>
+                        <li>En otro tazón, mezcla los ingredientes de la vinagreta.</li>
+                        <li>Vierte la vinagreta sobre la ensalada y mezcla bien.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-salsa-bbq',
+                title: 'Salsa Barbacoa Casera',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/8f250c/ffffff?text=Salsa+Barbacoa',
+                time: '15 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 taza de kétchup.</li>
+                        <li>1/4 taza de vinagre de sidra de manzana.</li>
+                        <li>2 cdas de azúcar moreno.</li>
+                        <li>1 cda de mostaza Dijon.</li>
+                        <li>1 cdta de salsa Worcestershire.</li>
+                        <li>1 cdta de pimentón ahumado.</li>
+                        <li>1/2 cdta de ajo en polvo.</li>
+                        <li>1/2 cdta de cebolla en polvo.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Combina todos los ingredientes en una cacerola a fuego medio.</li>
+                        <li>Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.</li>
+                        <li>Deja enfriar antes de usar.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-maiz-parrilla',
+                title: 'Maíz a la Parrilla con Mantequilla de Hierbas',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/fde047/4a2d1f?text=Maíz+a+la+Parrilla',
+                time: '20 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 mazorcas de maíz, con hojas.</li>
+                        <li>4 cdas de mantequilla derretida.</li>
+                        <li>2 cdas de perejil fresco picado.</li>
+                        <li>2 cdas de cebollín fresco picado.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Remoja las mazorcas en agua por al menos 30 minutos.</li>
+                        <li>Precalienta el barril a temperatura media-alta.</li>
+                        <li>Asa las mazorcas directamente en la parrilla, girando, por 10-15 minutos o hasta que estén tiernas y doradas.</li>
+                        <li>Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.</li>
+                        <li>Cepilla el maíz con la mantequilla de hierbas antes de servir.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-esparragos',
+                title: 'Espárragos a la Parrilla con Limón y Parmesano',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/84cc16/ffffff?text=Espárragos',
+                time: '10 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>1 manojo de espárragos frescos.</li>
+                        <li>2 cdas de aceite de oliva.</li>
+                        <li>1 limón (jugo y ralladura).</li>
+                        <li>1/4 taza de queso parmesano rallado.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava y recorta los extremos leñosos de los espárragos.</li>
+                        <li>Mezcla aceite de oliva, jugo y ralladura de limón, parmesano, sal y pimienta.</li>
+                        <li>Cepilla los espárragos con esta mezcla.</li>
+                        <li>Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.</li>
+                        <li>Sirve con más ralladura de limón y parmesano.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-ensalada-tomate',
+                title: 'Ensalada de Tomate y Mozzarella con Albahaca',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/ef4444/ffffff?text=Ensalada+Tomate+Mozzarella',
+                time: '5 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 tomates medianos, en rodajas.</li>
+                        <li>200 g de queso mozzarella fresco, en rodajas.</li>
+                        <li>Hojas frescas de albahaca.</li>
+                        <li>2 cdas de aceite de oliva virgen extra.</li>
+                        <li>Vinagre balsámico.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Alterna las rodajas de tomate y mozzarella en un plato.</li>
+                        <li>Coloca hojas de albahaca entre las rodajas.</li>
+                        <li>Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.</li>
+                        <li>Deja reposar unos minutos antes de servir.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-papas-hasselback',
+                title: 'Papas Hasselback con Hierbas y Queso',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/f5cb5c/4a2d1f?text=Papas+Hasselback',
+                time: '1 hora',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>4 papas medianas.</li>
+                        <li>4 cdas de mantequilla derretida.</li>
+                        <li>2 cdas de romero fresco picado.</li>
+                        <li>1/4 taza de queso cheddar rallado.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Lava las papas y córtalas en rodajas finas sin llegar al fondo.</li>
+                        <li>Precalienta el barril a 204°C.</li>
+                        <li>Coloca las papas en una fuente resistente al fuego.</li>
+                        <li>Mezcla la mantequilla derretida con romero, sal y pimienta. Cepilla sobre las papas.</li>
+                        <li>Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.</li>
+                        <li>Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-yuca-frita',
+                title: 'Yuca Frita con Mojo',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/ffe8d6/4a2d1f?text=Yuca+Frita+con+Mojo',
+                time: '45 min',
+                difficulty: 'Media',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 yucas medianas, peladas y en tiras.</li>
+                        <li>Aceite vegetal para freír.</li>
+                        <li>Sal al gusto.</li>
+                        <li>Para el Mojo:
+                            <ul class="list-disc pl-6">
+                                <li>4 dientes de ajo, picados finamente.</li>
+                                <li>1/2 taza de aceite de oliva.</li>
+                                <li>1/4 taza de jugo de limón.</li>
+                                <li>Sal y pimienta al gusto.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Hierve las tiras de yuca en agua con sal hasta que estén tiernas (20-25 min). Escurre y deja enfriar.</li>
+                        <li>Precalienta el barril a 190°C para freír (o usa sartén con aceite).</li>
+                        <li>Fríe las tiras de yuca hasta que estén doradas y crujientes. Escurre y sazona con sal.</li>
+                        <li>Para el mojo: Calienta aceite de oliva, agrega el ajo y cocina a fuego lento hasta que esté dorado.</li>
+                        <li>Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.</li>
+                        <li>Sirve la yuca caliente con el mojo.</li>
+                    </ol>
+                `
+            },
+            {
+                id: 'receta-pure-yuca',
+                title: 'Puré de Yuca con Queso',
+                category: 'acompanamiento',
+                image: 'https://placehold.co/400x200/fff4e6/4a2d1f?text=Puré+de+Yuca',
+                time: '30 min',
+                difficulty: 'Fácil',
+                content: `
+                    <h3 class="font-bold text-xl mb-3">Ingredientes:</h3>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li>2 yucas medianas, peladas y en trozos.</li>
+                        <li>1/2 taza de queso crema.</li>
+                        <li>1/4 taza de leche caliente.</li>
+                        <li>2 cdas de mantequilla.</li>
+                        <li>Sal y pimienta al gusto.</li>
+                    </ul>
+                    <h3 class="font-bold text-xl mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Hierve la yuca en agua con sal hasta que esté tierna (20-25 min). Escurre.</li>
+                        <li>En un tazón, mezcla la yuca, queso crema, leche caliente y mantequilla.</li>
+                        <li>Usa un machacador o procesador para hacer un puré suave.</li>
+                        <li>Sazona con sal y pimienta. Sirve caliente.</li>
+                    </ol>
+                `
+            }
+        ];
+        // --- FIN: Base de Datos de Recetas (JSON) ---
+
+
+        // --- INICIO: Lógica de la Aplicación ---
         document.addEventListener('DOMContentLoaded', function () {
             
             // --- Declaración de variables ---
             const tabs = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             const accordionItems = document.querySelectorAll('.accordion-item');
-            const recipeCards = document.querySelectorAll('.recipe-card');
             
             // Variables del Modal
             const modal = document.getElementById('recipe-modal');
-            const modalContent = document.getElementById('modal-content');
             const modalClose = document.getElementById('modal-close');
             const modalTitle = document.getElementById('modal-title');
             const modalBody = document.getElementById('modal-body');
+            const modalPrintBtn = document.getElementById('modal-print-btn');
+
+            // Variables de Recetas (se llenarán dinámicamente)
+            let allRecipeCards = []; // Se llenará después de generar las tarjetas
+            const gridPrincipales = document.getElementById('grid-principales');
+            const gridAcompanamientos = document.getElementById('grid-acompanamientos');
+            
+            // Variables de Filtro/Búsqueda
+            const filterContainer = document.getElementById('filter-container');
+            const searchBar = document.getElementById('search-bar');
+            const headerPrincipales = document.getElementById('header-principales');
+            const headerAcompanamientos = document.getElementById('header-acompanamientos');
+            const noResults = document.getElementById('no-results');
+
+            // Mapa de iconos
+            const iconMap = {
+                cerdo: '🐖',
+                res: '🐄',
+                pollo: '🐓',
+                cordero: '🐑',
+                pavo: '🦃',
+                pescado: '🐟',
+                acompanamiento: '🥗'
+            };
 
             // --- Funcionalidad de Pestañas (Tabs) ---
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    // Desactivar todos
                     tabs.forEach(t => t.classList.remove('active'));
                     tabContents.forEach(c => c.classList.remove('active'));
-                    
-                    // Activar el seleccionado
                     tab.classList.add('active');
                     const activeTabContent = document.getElementById(tab.dataset.tab + '-content');
-                    if (activeTabContent) {
-                        activeTabContent.classList.add('active');
-                    }
+                    if (activeTabContent) activeTabContent.classList.add('active');
                 });
             });
 
@@ -1028,15 +1118,61 @@
                 });
             });
 
-            // --- Funcionalidad del Modal de Recetas ---
-            function openModal(recipeId, recipeTitle) {
-                const recipeContent = document.getElementById(recipeId);
+            // --- ! INICIO: Generación Dinámica de Recetas ---
+            function generateRecipeCards() {
+                if (!gridPrincipales || !gridAcompanamientos) return;
+
+                let gridPrincipalesHTML = '';
+                let gridAcompanamientosHTML = '';
+
+                recipeData.forEach(recipe => {
+                    const icon = iconMap[recipe.category] || '🍽️';
+                    const cardHTML = `
+                        <div class="recipe-card rounded-lg shadow-md overflow-hidden" data-recipe-id="${recipe.id}" data-category="${recipe.category}">
+                            <img src="${recipe.image}" alt="${recipe.title}" class="w-full h-40 object-cover">
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold">${icon} ${recipe.title}</h3>
+                            </div>
+                            <div class="card-details">
+                                <span><strong>Tiempo:</strong> ${recipe.time}</span>
+                                <span><strong>Dificultad:</strong> ${recipe.difficulty}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (recipe.category === 'acompanamiento') {
+                        gridAcompanamientosHTML += cardHTML;
+                    } else {
+                        gridPrincipalesHTML += cardHTML;
+                    }
+                });
+
+                gridPrincipales.innerHTML = gridPrincipalesHTML;
+                gridAcompanamientos.innerHTML = gridAcompanamientosHTML;
+
+                // ! IMPORTANTE: Seleccionar las tarjetas DESPUÉS de generarlas
+                allRecipeCards = document.querySelectorAll('.recipe-card');
                 
-                if (recipeContent && modalTitle && modalBody && modal) {
-                    modalTitle.textContent = recipeTitle;
-                    modalBody.innerHTML = recipeContent.innerHTML;
-                    modal.style.display = 'flex'; // Usar flex para centrar
-                    document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+                // Añadir listeners a las nuevas tarjetas
+                allRecipeCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const recipeId = card.dataset.recipeId;
+                        openModal(recipeId);
+                    });
+                });
+            }
+            // --- ! FIN: Generación Dinámica de Recetas ---
+
+
+            // --- ! INICIO: Funcionalidad del Modal de Recetas (Actualizada) ---
+            function openModal(recipeId) {
+                const recipe = recipeData.find(r => r.id === recipeId);
+                
+                if (recipe && modalTitle && modalBody && modal) {
+                    modalTitle.textContent = recipe.title;
+                    modalBody.innerHTML = recipe.content;
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
                 }
             }
 
@@ -1047,69 +1183,105 @@
                 }
             }
 
-            recipeCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const recipeId = card.dataset.recipeId;
-                    const recipeTitle = card.querySelector('h3')?.textContent || 'Receta';
-                    openModal(recipeId, recipeTitle);
-                });
-            });
-
             // Clicks para cerrar el modal
-            // Cerrar al hacer clic en el fondo oscuro (el modal mismo)
-            if (modal) {
-                modal.addEventListener('click', (event) => {
-                    if (event.target === modal) { // Solo si se hace clic en el fondo
-                        closeModal();
+            if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+            if (modalClose) modalClose.addEventListener('click', closeModal);
+            // --- ! FIN: Funcionalidad del Modal de Recetas ---
+
+
+            // --- ! INICIO: Funcionalidad de Filtro y Búsqueda combinada ---
+            function updateRecipeView() {
+                if (!filterContainer || !searchBar || !allRecipeCards.length) return;
+
+                const activeFilter = filterContainer.querySelector('.filter-button.active').dataset.filter;
+                const searchTerm = searchBar.value.toLowerCase();
+                let mainVisibleCount = 0;
+                let accompVisibleCount = 0;
+
+                allRecipeCards.forEach(card => {
+                    const category = card.dataset.category;
+                    const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                    
+                    const matchesFilter = (activeFilter === 'todos') || (activeFilter === category);
+                    const matchesSearch = title.includes(searchTerm);
+
+                    if (matchesFilter && matchesSearch) {
+                        card.style.display = 'block';
+                        if (category === 'acompanamiento') {
+                            accompVisibleCount++;
+                        } else {
+                            mainVisibleCount++;
+                        }
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
+
+                // Actualizar visibilidad de cabeceras
+                if (headerPrincipales) headerPrincipales.style.display = (mainVisibleCount > 0) ? 'block' : 'none';
+                if (headerAcompanamientos) headerAcompanamientos.style.display = (accompVisibleCount > 0) ? 'block' : 'none';
+
+                // Mostrar mensaje de no resultados
+                if (noResults) {
+                    noResults.style.display = (mainVisibleCount === 0 && accompVisibleCount === 0) ? 'block' : 'none';
+                }
             }
 
-            // ---! REVERSIÓN: Funcionalidad de Búsqueda Eliminada ---
-            
-            // ---! INICIO: Funcionalidad de Filtros de Categoría ---
-            const filterContainer = document.getElementById('filter-container');
-            const allRecipeCards = document.querySelectorAll('.recipe-card');
-            const headerPrincipales = document.getElementById('header-principales');
-            const headerAcompanamientos = document.getElementById('header-acompanamientos');
-
+            // Event Listeners para Filtro y Búsqueda
             if (filterContainer) {
                 filterContainer.addEventListener('click', (event) => {
-                    // Asegurarse de que se hizo clic en un botón
                     if (event.target.classList.contains('filter-button')) {
-                        const filter = event.target.dataset.filter;
-
-                        // Actualizar estado del botón
                         filterContainer.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
                         event.target.classList.add('active');
-
-                        // Filtrar tarjetas
-                        allRecipeCards.forEach(card => {
-                            const category = card.dataset.category;
-                            if (filter === 'todos' || filter === category) {
-                                card.style.display = 'block';
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        });
-
-                        // Mostrar/ocultar cabeceras
-                        if (filter === 'todos') {
-                            if (headerPrincipales) headerPrincipales.style.display = 'block';
-                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'block';
-                        } else if (filter === 'acompanamiento') {
-                            if (headerPrincipales) headerPrincipales.style.display = 'none';
-                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'block';
-                        } else { // Es un filtro de plato principal (cerdo, res, etc.)
-                            if (headerPrincipales) headerPrincipales.style.display = 'block';
-                            if (headerAcompanamientos) headerAcompanamientos.style.display = 'none';
-                        }
+                        updateRecipeView();
                     }
                 });
             }
-            // ---! FIN: Funcionalidad de Filtros de Categoría ---
+            if (searchBar) searchBar.addEventListener('keyup', updateRecipeView);
+            // --- ! FIN: Funcionalidad de Filtro y Búsqueda ---
+
+
+            // --- ! INICIO: Funcionalidad de Imprimir ---
+            function handlePrint() {
+                const title = modalTitle.textContent;
+                const content = document.getElementById('modal-body-printable').innerHTML;
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Imprimir Receta</title>');
+                // Estilos simples para impresión
+                printWindow.document.write(`
+                    <style>
+                        body { font-family: 'Inter', sans-serif; line-height: 1.6; }
+                        h1 { color: #d97706; }
+                        h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+                        ul, ol { padding-left: 20px; }
+                    </style>
+                `);
+                printWindow.document.write('</head><body>');
+                printWindow.document.write(`<h1>${title}</h1>`);
+                printWindow.document.write(content);
+                printWindow.document.write('</body></html>');
+                
+                printWindow.document.close();
+                printWindow.focus();
+                
+                // Esperar a que el contenido se cargue antes de imprimir
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 250);
+            }
+
+            if (modalPrintBtn) modalPrintBtn.addEventListener('click', handlePrint);
+            // --- ! FIN: Funcionalidad de Imprimir ---
+
+
+            // --- INICIO: Ejecución Inicial ---
+            generateRecipeCards();
+            updateRecipeView(); // Para ocultar cabeceras si están vacías al inicio (aunque no debería pasar)
 
         });
+        // --- FIN: Lógica de la Aplicación ---
     </script>
 </body>
 </html>
