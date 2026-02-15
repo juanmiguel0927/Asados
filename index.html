@@ -3,1485 +3,690 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía Interactiva de Asados al Barril</title>
-    <!-- Carga de Tailwind CSS -->
+    <title>Raíces y Fogones | Enciclopedia Gastronómica</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Estilos personalizados */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f3e8; /* Tono crema claro inspirado en el PDF */
-            color: #4a2d1f; /* Marrón oscuro para el texto */
-        }
-        .tab-button {
-            transition: all 0.3s ease;
-            border-bottom-width: 4px;
-            border-color: transparent;
-        }
-        .tab-button.active {
-            border-color: #d97706; /* Naranja/ámbar */
-            color: #d97706;
-            font-weight: 700;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .accordion-header {
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .accordion-header:hover {
-            background-color: #fffbf0;
-        }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out;
-        }
-        .recipe-card {
-            background-color: #ffffff;
-            border: 1px solid #e0d9c4;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            /* ! Se añade para la lógica de filtrado/búsqueda */
-            display: block; 
-        }
-        .recipe-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-        }
-        /* Estilos del Modal */
-        #recipe-modal {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            z-index: 50;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6);
-            align-items: center;
-            justify-content: center;
-        }
-        #modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 24px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: slide-down 0.3s ease-out;
-        }
-        #modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            line-height: 1;
-            color: #9ca3af;
-        }
-        #modal-close:hover {
-            color: #111827;
-        }
-        @keyframes slide-down {
-            from {
-                transform: translateY(-30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        ul, ol {
-            list-style-position: inside;
-        }
-        ul {
-            list-style-type: disc;
-        }
-        ol {
-            list-style-type: decimal;
-        }
-        /* Estilos para Filtros */
-        .filter-button {
-            background-color: #f3f4f6;
-            color: #4a2d1f;
-            padding: 8px 16px;
-            border-radius: 99px;
-            border: 1px solid #e0d9c4;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .filter-button:hover {
-            background-color: #fffbf0;
-        }
-        .filter-button.active {
-            background-color: #d97706;
-            color: #ffffff;
-            border-color: #d97706;
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+        
+        body { font-family: 'Lato', sans-serif; background-color: #fdfbf7; color: #1c1917; }
+        h1, h2, h3, h4, .font-serif { font-family: 'Playfair Display', serif; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .pattern-grid {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* ! INICIO: Nuevos Estilos (Búsqueda, Impresión, Nuevos Datos) */
-        #search-bar {
-            width: 100%;
-            padding: 10px 16px;
-            border: 2px solid #e0d9c4;
-            border-radius: 12px;
-            font-size: 1rem;
-            color: #4a2d1f;
-            background-color: #fffbf0;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        #search-bar:focus {
-            outline: none;
-            border-color: #d97706;
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
-        }
-        /* ! INICIO: Nuevos Estilos (Orden, Favoritos, Tips) */
-        #sort-select {
-            padding: 10px 16px;
-            border: 2px solid #e0d9c4;
-            border-radius: 12px;
-            font-size: 1rem;
-            color: #4a2d1f;
-            background-color: #fffbf0;
-            width: 100%;
-        }
-        #sort-select:focus {
-            outline: none;
-            border-color: #d97706;
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
-        }
-        .favorite-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 1.75rem; /* 28px */
-            cursor: pointer;
-            transition: transform 0.2s ease, color 0.2s ease;
-            color: rgba(255, 255, 255, 0.7); /* Blanco semitransparente */
-            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            z-index: 10;
-        }
-        .favorite-btn:hover {
-            transform: scale(1.15);
-        }
-        .favorite-btn.active {
-            color: #ef4444; /* Rojo */
-            transform: scale(1.1);
-        }
-        .recipe-card-image-container {
-            position: relative;
-        }
-        #modal-tips-content {
-            background-color: #fffbf0;
-            border-left: 4px solid #d97706;
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 16px;
-        }
-        /* ! FIN: Nuevos Estilos */
-        .card-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 16px 12px;
-            background-color: #fdfcf9;
-            border-top: 1px solid #f3f0e8;
-            font-size: 0.875rem;
-            color: #785a4b;
-        }
-        #modal-print-btn {
-            background-color: #d97706;
-            color: white;
-            font-weight: 600;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 24px;
-        }
-        #modal-print-btn:hover {
-            background-color: #b45f06;
-        }
-        /* Estilos de impresión */
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
+            .no-print { display: none !important; }
+            body { background: white; }
         }
-        /* ! FIN: Nuevos Estilos */
-
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
+    <div id="root"></div>
 
-    <div class="container mx-auto max-w-6xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-        <!-- Cabecera -->
-        <header class="p-6 md:p-8 bg-cover bg-center" style="background-image: url('https://placehold.co/1200x300/8c5a40/f7f3e8?text=Asados+al+Barril');">
-            <!-- Título eliminado -->
-        </header>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
 
-        <!-- Pestañas de Navegación -->
-        <nav class="flex border-b border-gray-300 bg-gray-50">
-            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-800 active" data-tab="tecnicas">
-                Técnicas Esenciales
-            </button>
-            <button class="tab-button flex-1 py-4 px-6 text-lg font-semibold text-gray-800" data-tab="recetas">
-                Recetario Completo
-            </button>
-        </nav>
+        // --- ICONOS SVG ---
+        const Icons = {
+            Search: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Menu: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>,
+            X: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            Heart: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill={props.fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Clock: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            ChefHat: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><path d="M6 17h12"/></svg>,
+            Leaf: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
+            Flame: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
+            CookingPot: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8"/></svg>,
+            Star: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+            Printer: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>,
+            Maximize: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>,
+            Minimize: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>,
+            CheckSquare: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+            Square: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><rect width="18" height="18" x="3" y="3" rx="2"/></svg>,
+            ShoppingBag: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+            Trash2: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>,
+            Scale: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>,
+            AlertCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+            Share2: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
+            ArrowRight: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+            Plus: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+            Minus: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+            BookOpen: (props) => <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        };
 
-        <!-- Contenido de Pestañas -->
-        <main class="p-6 md:p-8 pb-16">
-
-            <!-- Pestaña de Técnicas -->
-            <section id="tecnicas-content" class="tab-content active space-y-4">
-                
-                <!-- Acordeón de Técnicas (Sin cambios) -->
-                <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <h3 class="accordion-header flex justify-between items-center p-5">
-                        <span class="text-xl font-bold text-amber-700">Cap. 1: Fundamentos de los Asados al Barril</span>
-                        <span class="text-2xl font-light">+</span>
-                    </h3>
-                    <div class="accordion-content px-5 pb-5">
-                        <ul class="list-disc space-y-2 text-base">
-                            <li><strong>¿Qué son?</strong> Técnica culinaria de cocción lenta con calor indirecto y humo, que da un sabor ahumado y textura tierna.</li>
-                            <li><strong>Equipo Básico:</strong> Barril o parrilla, termómetro confiable, leña o carbón de calidad.</li>
-                            <li><strong>Preparación y Encendido:</strong>
-                                <ol class="list-decimal ml-6 mt-1">
-                                    <li>Limpiar el barril o parrilla de residuos.</li>
-                                    <li>Añadir leña o carbón y encender. Dejar que se desarrollen las brasas.</li>
-                                    <li>Ajustar la temperatura usando las ventilas para controlar el calor.</li>
-                                </ol>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <h3 class="accordion-header flex justify-between items-center p-5">
-                        <span class="text-xl font-bold text-amber-700">Cap. 2: Selección y Preparación de la Carne</span>
-                        <span class="text-2xl font-light">+</span>
-                    </h3>
-                    <div class="accordion-content px-5 pb-5">
-                        <ul class="list-disc space-y-2 text-base">
-                            <li><strong>Marmoleo:</strong> Busca vetas de grasa intramuscular (8-12% ideal) para sabor y jugosidad. Presente en Ribeye, filete de lomo, brisket.</li>
-                            <li><strong>Frescura:</strong> Compra en proveedores de confianza. Opta por carne local y de pasto si es posible.</li>
-                            <li><strong>Cortes Populares (Gramaje por persona):</strong>
-                                <ul class="list-disc ml-6 mt-1">
-                                    <li><strong>Costillar de Cerdo:</strong> 500g - 1kg. Clásico y jugoso.</li>
-                                    <li><strong>Brisket de Res:</strong> 200g - 300g. Sabor ahumado intenso, textura tierna.</li>
-                                    <li><strong>Pechuga de Pollo:</strong> 150g - 200g. Magra y versátil, absorbe bien sabores.</li>
-                                    <li><strong>Lomo de Cerdo:</strong> 200g - 250g. Magro y tierno, ideal para personalizar.</li>
-                                    <li><strong>Muslos de Pollo:</strong> 2 muslos (150g-200g total). Jugosos y con más grasa.</li>
-                                    <li><strong>Costillas de Cordero:</strong> 200g - 250g. Tiernas y con sabor característico.</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <h3 class="accordion-header flex justify-between items-center p-5">
-                        <span class="text-xl font-bold text-amber-700">Cap. 3: Marinados y Adobos</span>
-                        <span class="text-2xl font-light">+</span>
-                    </h3>
-                    <div class="accordion-content px-5 pb-5">
-                        <p class="mb-4">Técnicas para infundir sabor y ablandar la carne antes de la cocción.</p>
-                        <h4 class="font-bold text-lg mb-2">Marinados (Líquidos)</h4>
-                        <ul class="list-disc space-y-2 mb-4">
-                            <li><strong>De Hierbas y Cítricos:</strong> Jugo de limón, aceite de oliva, romero, tomillo, ajo. (Marinar 2-4 horas).</li>
-                            <li><strong>De Cerveza y Mostaza:</strong> Cerveza (Ale), salsa de soja, mostaza Dijon, ajo, azúcar moreno. (Marinar 4-6 horas).</li>
-                        </ul>
-                        <h4 class="font-bold text-lg mb-2">Adobos (Pastas/Mezclas secas)</h4>
-                        <ul class="list-disc space-y-2">
-                            <li><strong>De Chile y Ajo:</strong> Chiles secos (guajillo, ancho), ajo, aceite de oliva, comino, orégano. Se licúa hasta formar una pasta.</li>
-                            <li><strong>De Yogur y Hierbas:</strong> Yogur natural, menta, cilantro, comino, paprika. Reposar 2 horas.</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <h3 class="accordion-header flex justify-between items-center p-5">
-                        <span class="text-xl font-bold text-amber-700">Cap. 4: Técnicas de Cocina</span>
-                        <span class="text-2xl font-light">+</span>
-                    </h3>
-                    <div class="accordion-content px-5 pb-5">
-                        <ul class="list-disc space-y-4 text-base">
-                            <li><strong>Control de Temperatura:</strong>
-                                <ul class="list-disc ml-6 mt-1 space-y-2">
-                                    <li><strong>Zonas de Calor:</strong> Crear una zona directa (sobre brasas, para sellar) y una indirecta (lejos de brasas, para cocción lenta y ahumado).</li>
-                                    <li><strong>Medición:</strong> Usar un termómetro confiable. Ajustar temperatura con las ventilas (más abiertas = más calor).</li>
-                                    <li><strong>Temperaturas Internas Objetivo:</strong>
-                                        <ul class="list-disc ml-6 mt-1">
-                                            <li>Costillar de Cerdo: 63-71°C</li>
-                                            <li>Brisket de Res: 88-93°C</li>
-                                            <li>Pechuga de Pollo: 74-79°C</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li><strong>Cocción Lenta (Indirecta):</strong>
-                                <ul class="list-disc ml-6 mt-1 space-y-2">
-                                    <li><strong>Definición:</strong> La carne se coloca lejos del fuego directo. Es la técnica principal para asados al barril (BBQ).</li>
-                                    <li><strong>Uso:</strong> Perfecta para piezas grandes que requieren tiempos largos (ej. brisket 10-12 horas a 107-121°C). Logra la textura tierna y desmenuzable.</li>
-                                    <li><strong>Humedad:</strong> Colocar recipientes con agua en el barril para evitar que la carne se seque.</li>
-                                    <li><strong>Rotación:</strong> Girar y voltear la carne (especialmente piezas grandes) para cocción uniforme.</li>
-                                </ul>
-                            </li>
-                            <li><strong>Cocción Rápida (Directa / Sellado):</strong>
-                                <ul class="list-disc ml-6 mt-1 space-y-2">
-                                    <li><strong>Definición:</strong> La carne se coloca directamente sobre las brasas calientes.</li>
-                                    <li><strong>Uso:</strong> Ideal para sellar la carne, crear una costra (reacción de Maillard) y cocinar cortes más delgados.</li>
-                                    <li><strong>Tiempos Cortos:</strong> Se usa para filetes (3-5 min por lado), costillas de cordero (3-4 min por lado) o para dorar la carne antes de pasarla a cocción indirecta.</li>
-                                </ul>
-                            </li>
-                            <li><strong>Sabor Ahumado Perfecto:</strong>
-                                <ul class="list-disc ml-6 mt-1 space-y-2">
-                                    <li><strong>Selección de Madera:</strong> Nogal (suave), Manzano (frutal), Nogal Americano (fuerte), Mezquite (intenso).</li>
-                                    <li><strong>Remojo:</strong> Remojar la madera 30 min antes para un humo más limpio.</li>
-                                    <li><strong>Control del Humo:</strong> Evitar humo denso (da sabor amargo). Usar ventilas.</li>
-                                    <li><strong>Tiempo y Temperatura:</strong> Ahumar entre 107-121°C. (ej. Costillar 2-4 horas, Brisket 4-6 horas).</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="accordion-item bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <h3 class="accordion-header flex justify-between items-center p-5">
-                        <span class="text-xl font-bold text-amber-700">Cap. 7: Servicio y Presentación</span>
-                        <span class="text-2xl font-light">+</span>
-                    </h3>
-                    <div class="accordion-content px-5 pb-5">
-                        <ul class="list-disc space-y-2 text-base">
-                            <li><strong>Primera Impresión:</strong> Usar vajilla limpia. Combinar colores y contrastes de los alimentos.</li>
-                            <li><strong>Decoración:</strong> Usar elementos frescos como hierbas (albahaca, perejil) o rodajas de limón.</li>
-                            <li><strong>Salsas y Aderezos:</strong> Servir en recipientes decorativos. Experimentar con salsas caseras.</li>
-                            <li><strong>Acompañamientos:</strong> Combinar texturas (crujientes y suaves) y colores.</li>
-                            <li><strong>Servicio:</strong> Mantener platos calientes. Informar la temperatura de la carne. Ser amable y atento.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Pestaña de Recetas -->
-            <section id="recetas-content" class="tab-content">
-                
-                <!-- ! INICIO: Controles de Búsqueda y Filtro -->
-                <div class="mb-8 space-y-4">
-                    <!-- Barra de Búsqueda -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="search-bar" class="block text-sm font-semibold mb-2">Buscar Receta:</label>
-                            <input type="text" id="search-bar" placeholder="Ej: Costillar, Brisket, Papas...">
-                        </div>
-                        <!-- ! INICIO: Opciones de Ordenar -->
-                        <div>
-                            <label for="sort-select" class="block text-sm font-semibold mb-2">Ordenar por:</label>
-                            <select id="sort-select">
-                                <option value="default">Relevancia</option>
-                                <option value="time-asc">Tiempo (más rápido primero)</option>
-                                <option value="time-desc">Tiempo (más lento primero)</option>
-                                <option value="difficulty-asc">Dificultad (más fácil primero)</option>
-                                <option value="difficulty-desc">Dificultad (más difícil primero)</option>
-                                <option value="name-asc">Nombre (A-Z)</option>
-                                <option value="name-desc">Nombre (Z-A)</option>
-                            </select>
-                        </div>
-                        <!-- ! FIN: Opciones de Ordenar -->
-                    </div>
-                    
-                    <!-- Contenedor de Filtros -->
-                    <div id="filter-container" class="flex flex-wrap gap-2">
-                        <button class="filter-button active" data-filter="todos">Ver Todo</button>
-                        <!-- ! INICIO: Botón de Favoritos -->
-                        <button class="filter-button" data-filter="favoritos">❤️ Favoritos</button>
-                        <!-- ! FIN: Botón de Favoritos -->
-                        <button class="filter-button" data-filter="cerdo">🐖 Cerdo</button>
-                        <button class="filter-button" data-filter="res">🐄 Res</button>
-                        <button class="filter-button" data-filter="pollo">🐓 Pollo</button>
-                        <button class="filter-button" data-filter="cordero">🐑 Cordero</button>
-                        <button class="filter-button" data-filter="pavo">🦃 Pavo</button>
-                        <button class="filter-button" data-filter="pescado">🐟 Pescado</button>
-                        <button class="filter-button" data-filter="acompanamiento">🥗 Acompañamiento</button>
-                    </div>
-                </div>
-                <!-- ! FIN: Controles de Búsqueda y Filtro -->
-
-                <!-- Platos Principales -->
-                <h2 id="header-principales" class="text-3xl font-bold text-amber-800 mb-6 border-b-2 border-amber-300 pb-2">Platos Principales (Cap. 5)</h2>
-                <!-- ! CONTENEDOR VACÍO: Las tarjetas se generarán aquí -->
-                <div id="grid-principales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Las tarjetas de recetas principales se inyectarán aquí dinámicamente -->
-                </div>
-
-                <!-- Acompañamientos y Salsas -->
-                <h2 id="header-acompanamientos" class="text-3xl font-bold text-amber-800 mt-12 mb-6 border-b-2 border-amber-300 pb-2">Acompañamientos y Salsas (Cap. 6)</h2>
-                <!-- ! CONTENEDOR VACÍO: Las tarjetas se generarán aquí -->
-                <div id="grid-acompanamientos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Las tarjetas de recetas de acompañamiento se inyectarán aquí dinámicamente -->
-                </div>
-
-                <!-- Mensaje de no resultados -->
-                <p id="no-results" class="text-center text-gray-500 text-lg mt-10" style="display: none;">No se encontraron recetas que coincidan con tu búsqueda.</p>
-
-            </section>
-        </main>
-
-        <!-- Footer con Créditos -->
-        <footer class="p-6 text-center text-sm text-gray-500 border-t border-gray-300 bg-gray-50">
-            <p>Créditos: Juan Miguel Rios Redondo</p>
-        </footer>
-
-    </div>
-
-    <!-- Modal para Recetas -->
-    <div id="recipe-modal">
-        <div id="modal-content">
-            <span id="modal-close">&times;</span>
-            <h2 id="modal-title" class="text-3xl font-bold mb-4 text-amber-800"></h2>
-            <!-- ! Contenedor para el área imprimible -->
-            <div id="modal-body-printable">
-                <div id="modal-body" class="space-y-4 text-base">
-                    <!-- El contenido de la receta se inyectará aquí -->
-                </div>
-                <!-- ! INICIO: Contenedor de Tips -->
-                <div id="modal-tips-content" class="hidden">
-                    <h3 class="font-bold text-xl mb-3 text-amber-800">💡 Consejos del Asador</h3>
-                    <p id="modal-tips-text" class="text-base"></p>
-                </div>
-                <!-- ! FIN: Contenedor de Tips -->
-            </div>
-            <!-- ! Botón de Imprimir -->
-            <button id="modal-print-btn">Imprimir Receta</button>
-        </div>
-    </div>
-
-
-    <!-- ! INICIO: Base de datos de recetas en JSON y Lógica de la App -->
-    <script>
-        // --- INICIO: Base de Datos de Recetas (JSON) ---
-        // ! REFACTORIZADO: 'content' se ha dividido en 'ingredients' (objetos) e 'instructions' (strings).
-        const recipeData = [
-            // --- PLATOS PRINCIPALES ---
-            {
-                id: 'receta-costillar-clasico',
-                title: 'Costillar de Cerdo con Sazonado Clásico',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/c27a42/ffffff?text=Costillar+de+Cerdo',
-                time: '3-4 horas',
-                timeMinutes: 210,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "1", unit: "", name: "costillar de cerdo (aprox. 2 kg)." },
-                    { amount: "", unit: "", name: "Sazonado Clásico (Cap. 2):", isSubheader: true },
-                    { amount: "2", unit: "cdas", name: "de sal", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de pimienta negra", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de paprika", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de azúcar moreno", isSubItem: true },
-                    { amount: "1", unit: "cdta", name: "de ajo en polvo", isSubItem: true },
-                    { amount: "1", unit: "cdta", name: "de cebolla en polvo", isSubItem: true }
+        // --- CONFIGURACIÓN DE MÓDULOS ---
+        const MODULES = {
+            jams: {
+                id: 'jams',
+                title: 'Dulces & Conservas',
+                subtitle: 'Técnica Grazie Canella',
+                icon: Icons.Leaf,
+                theme: { text: 'text-red-800', bgSolid: 'bg-red-600', bgLight: 'bg-red-50', border: 'border-red-600', gradient: 'from-red-400 to-orange-300' },
+                guide: [
+                    { title: "El Secreto de la Pectina", content: "La pectina natural está en la piel y semillas de frutas como manzana y maracuyá. Úsala para espesar sin añadir químicos." },
+                    { title: "Punto de Napa (105°C)", content: "Para saber si está lista sin termómetro: pon una gota en un plato congelado. Si al empujarla con el dedo se arruga y no fluye, ¡ya está!" },
+                    { title: "Esterilización Total", content: "Hierve frascos y tapas 10 min. Envasa la mermelada hirviendo, tapa inmediatamente y voltea el frasco para crear vacío." },
+                    { title: "La Regla de Oro", content: "El azúcar no solo endulza, es el conservante. Reducirla demasiado afecta la duración y textura." }
                 ],
-                instructions: [
-                    "Lava y seca el costillar.",
-                    "Aplica generosamente el sazonado clásico por toda la superficie.",
-                    "Precalienta el barril a 121°C.",
-                    "Coloca el costillar en la zona indirecta.",
-                    "Cocina por 3-4 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.",
-                    "Verifica que la temperatura interna alcance los 71°C.",
-                    "Retira, deja reposar 15 minutos y corta."
-                ],
-                tips: 'Para una costra más sabrosa, puedes rociar el costillar con jugo de manzana cada 45 minutos durante la cocción.'
+                categories: [
+                    { id: 'all', name: 'Todas' }, { id: 'basicas', name: 'Básicas y Pectinas' }, { id: 'variadas', name: 'Frutas Variadas' },
+                    { id: 'mixtas', name: 'Mezclas' }, { id: 'salados', name: 'Para Salados' }, { id: 'flores', name: 'Flores' },
+                    { id: 'legumbres', name: 'Legumbres' }, { id: 'gourmet', name: 'Gourmet' }, { id: 'exoticas', name: 'Exóticas' },
+                    { id: 'alcohol', name: 'Con Alcohol' }, { id: 'fit', name: 'Sin Azúcar' }, { id: 'chutney', name: 'Chutneys' }
+                ]
             },
-            {
-                id: 'receta-brisket',
-                title: 'Brisket de Res Ahumado',
-                category: 'res',
-                image: 'https://placehold.co/400x200/a15c38/ffffff?text=Brisket+de+Res',
-                time: '10-12 horas',
-                timeMinutes: 660,
-                difficulty: 'Difícil',
-                difficultyValue: 3,
-                ingredients: [
-                    { amount: "1", unit: "", name: "brisket de res (4-5 kg)." },
-                    { amount: "", unit: "", name: "Sazonado Ahumado (Cap. 2):", isSubheader: true },
-                    { amount: "3", unit: "cdas", name: "de sal ahumada", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de pimienta negra", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de pimentón ahumado", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de ajo en polvo", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de cebolla en polvo", isSubItem: true }
+            bbq: {
+                id: 'bbq',
+                title: 'Maestros del Fuego',
+                subtitle: 'Técnica Doctor Burger',
+                icon: Icons.Flame,
+                theme: { text: 'text-amber-900', bgSolid: 'bg-amber-700', bgLight: 'bg-amber-50', border: 'border-amber-700', gradient: 'from-amber-600 to-orange-200' },
+                guide: [
+                    { title: "Temperaturas del Barril", content: "🔵 Lenta (Ahumado): 107°C - 120°C\n🟡 Moderada (General): 150°C - 175°C\n🔴 Rápida (Asado): 180°C - 200°C+" },
+                    { title: "Términos de Res", content: "🔵 Azul (55°C): Centro rojo frío.\n🟡 Medio (63°C): Centro rojo tibio.\n🟠 3/4 (71°C): Rosado.\n🟤 Bien Asado (77°C+): Gris." },
+                    { title: "Seguridad", content: "Cerdo: Mínimo 63°C | Pollo: 74°C OBLIGATORIO | Pescado: 63°C." },
+                    { title: "El Humo", content: "Usa maderas frutales (manzano, cerezo) o duras (roble, nogal). Nunca maderas resinosas como el pino." }
                 ],
-                instructions: [
-                    "Lava y seca el brisket.",
-                    "Aplica el sazonado ahumado por todas las superficies.",
-                    "Precalienta el barril a 107°C.",
-                    "Coloca el brisket en la zona indirecta, con la grasa hacia arriba.",
-                    "Cocina por 10-12 horas, manteniendo la temperatura y añadiendo madera de nogal para ahumar.",
-                    "Verifica que la temperatura interna alcance los 88-93°C.",
-                    "Retira, envuelve en papel aluminio y deja reposar 30 minutos antes de cortar."
-                ],
-                tips: 'La paciencia es clave. No subas el fuego. Para atravesar el "estancamiento" (stall) alrededor de los 70°C, puedes envolver el brisket en papel de estraza (butcher paper).'
+                categories: [
+                    { id: 'all', name: 'Todo' }, { id: 'cerdo', name: '🐖 Cerdo' }, { id: 'res', name: '🐄 Res' }, { id: 'pollo', name: '🐓 Pollo' },
+                    { id: 'otros_carnes', name: '🍖 Otras Carnes' }, { id: 'pescado', name: '🐟 Pescado' }, { id: 'acompanamiento', name: '🥗 Acompañamientos' }
+                ]
             },
-            {
-                id: 'receta-pollo-citricos',
-                title: 'Pollo Asado con Marinado de Hierbas y Cítricos',
-                category: 'pollo',
-                image: 'https://placehold.co/400x200/facc15/4a2d1f?text=Pollo+Asado',
-                time: '1.5-2 horas',
-                timeMinutes: 105,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "1", unit: "", name: "pollo entero (aprox. 2 kg)." },
-                    { amount: "", unit: "", name: "Marinado de Hierbas y Cítricos (Cap. 3):", isSubheader: true },
-                    { amount: "1/2", unit: "taza", name: "de jugo de limón fresco", isSubItem: true },
-                    { amount: "1/4", unit: "taza", name: "de aceite de oliva", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de romero fresco picado", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de tomillo fresco picado", isSubItem: true },
-                    { amount: "3", unit: "", name: "dientes de ajo picados", isSubItem: true },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
+            fritos: {
+                id: 'fritos',
+                title: 'Línea Amarilla',
+                subtitle: 'Técnica Gourmet Genius',
+                icon: Icons.CookingPot,
+                theme: { text: 'text-yellow-900', bgSolid: 'bg-yellow-500', bgLight: 'bg-yellow-50', border: 'border-yellow-600', gradient: 'from-yellow-400 to-orange-200' },
+                guide: [
+                    { title: "Hidratación de la Masa", content: "La harina de maíz precocida necesita agua tibia y reposo (mínimo 15 min) para que las partículas absorban el líquido y no se cuarteen al freír." },
+                    { title: "Temperatura del Aceite", content: "Prueba: Echa una bolita de masa. Si se hunde y burbujea suavemente, está listo (170°C). Si humea, está quemado. Si no burbujea, el frito quedará grasoso." },
+                    { title: "El Rebozado", content: "Para papas rellenas y carimañolas, el rebozado (huevo + harina) crea una barrera que impide que el relleno se salga y absorba aceite." },
+                    { title: "Maíz Añejo vs Trillado", content: "El maíz añejo da una textura más crocante y fermentada (pasteles). El trillado es más suave (arepas)." }
                 ],
-                instructions: [
-                    "Lava y seca el pollo.",
-                    "Prepara el marinado.",
-                    "Coloca el pollo y el marinado en una bolsa o recipiente. Refrigera por 2-4 horas.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca el pollo en la zona indirecta y cocina por 1-1.5 horas, volteando ocasionalmente.",
-                    "Verifica que la temperatura interna alcance los 74-79°C en la parte más gruesa.",
-                    "Retira y deja reposar 10 minutos antes de cortar."
-                ],
-                tips: 'Para una piel extra crujiente, seca muy bien el pollo con papel de cocina antes de marinarlo (especialmente si el marinado no es a base de aceite).'
-            },
-            {
-                id: 'receta-cordero-menta',
-                title: 'Costillas de Cordero con Salsa de Menta',
-                category: 'cordero',
-                image: 'https://placehold.co/400x200/8c7a6b/ffffff?text=Costillas+de+Cordero',
-                time: '20-30 min',
-                timeMinutes: 25,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "2", unit: "", name: "costillas de cordero (aprox. 200-250 g c/u)." },
-                    { amount: "", unit: "", name: "Salsa de Menta (Basada en Adobo de Yogur y Hierbas Cap. 3):", isSubheader: true },
-                    { amount: "1", unit: "taza", name: "de yogur natural", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de menta fresca picada", isSubItem: true },
-                    { amount: "2", unit: "cdas", name: "de cilantro fresco picado", isSubItem: true },
-                    { amount: "1", unit: "cdta", name: "de comino molido", isSubItem: true },
-                    { amount: "1", unit: "cdta", name: "de paprika", isSubItem: true },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
-                ],
-                instructions: [
-                    "Lava y seca las costillas.",
-                    "Prepara la salsa/adobo de menta.",
-                    "Aplica una capa generosa sobre las costillas y marina por al menos 30 minutos.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca las costillas en la zona directa y cocina 3-4 minutos por lado (para dorar).",
-                    "Mueve a la zona indirecta y continúa cocinando 8-10 minutos, volteando y cepillando con más salsa.",
-                    "Verifica que la temperatura interna alcance los 63-71°C (punto medio).",
-                    "Sirve con más salsa por encima."
-                ],
-                tips: 'El cordero se cocina rápido. No lo cocines en exceso. El punto medio (rosa por dentro) es ideal para mantener su jugosidad.'
-            },
-            {
-                id: 'receta-pavo-arce',
-                title: 'Pechuga de Pavo Ahumada con Glaseado de Arce y Mostaza',
-                category: 'pavo',
-                image: 'https://placehold.co/400x200/d4a373/ffffff?text=Pechuga+de+Pavo',
-                time: '2-3 horas',
-                timeMinutes: 150,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "1", unit: "", name: "pechuga de pavo (aprox. 2 kg)." },
-                    { amount: "", unit: "", name: "Glaseado de Arce y Mostaza:", isSubheader: true },
-                    { amount: "1/2", unit: "taza", name: "de sirope de arce", isSubItem: true },
-                    { amount: "1/4", unit: "taza", name: "de mostaza Dijon", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de aceite de oliva", isSubItem: true },
-                    { amount: "1", unit: "cdta", name: "de paprika", isSubItem: true },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto", isSubItem: true }
-                ],
-                instructions: [
-                    "Lava y seca la pechuga de pavo.",
-                    "Prepara el glaseado mezclando los ingredientes.",
-                    "Aplica el glaseado sobre la pechuga uniformemente.",
-                    "Precalienta el barril a 149°C.",
-                    "Coloca la pechuga en la zona indirecta.",
-                    "Cocina por 2-3 horas, aplicando más glaseado regularmente.",
-                    "Verifica que la temperatura interna alcance los 74-79°C.",
-                    "Retira, deja reposar 10 minutos y rebana."
-                ],
-                tips: 'El pavo tiende a secarse. Usar un marinado o salmuera antes de glasear puede ayudar a mantenerlo jugoso. No cocines de más.'
-            },
-            {
-                id: 'receta-costillas-miel-mostaza',
-                title: 'Costillas de Cerdo con Glaseado de Miel y Mostaza',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/e6b980/4a2d1f?text=Costillas+Miel+Mostaza',
-                time: '2-3 horas',
-                timeMinutes: 150,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
-                    { amount: "1/2", unit: "taza", name: "de miel." },
-                    { amount: "1/4", unit: "taza", name: "de mostaza Dijon." },
-                    { amount: "2", unit: "cdas", name: "de salsa de soja." },
-                    { amount: "2", unit: "cdta", name: "de pimentón ahumado." },
-                    { amount: "1", unit: "cdta", name: "de ajo en polvo." },
-                    { amount: "1", unit: "cdta", name: "de cebolla en polvo." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Lava y seca las costillas.",
-                    "Mezcla miel, mostaza, soja, pimentón, ajo en polvo y cebolla en polvo para el glaseado.",
-                    "Aplica una capa generosa de glaseado y sazona con sal y pimienta.",
-                    "Precalienta el barril a 149°C.",
-                    "Coloca las costillas en la zona indirecta y cocina 2-3 horas, volteando y aplicando más glaseado cada 30 minutos.",
-                    "Verifica que la temperatura interna alcance los 71°C.",
-                    "Retira, corta y sirve con más glaseado."
-                ],
-                tips: 'Aplica el glaseado (que contiene azúcar/miel) solo durante los últimos 30-45 minutos de cocción para evitar que se queme.'
-            },
-            {
-                id: 'receta-costillas-coreanas',
-                title: 'Costillas de Cerdo Coreanas a la Parrilla',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/bf4e30/ffffff?text=Costillas+Coreanas',
-                time: '1.5-2 horas',
-                timeMinutes: 105,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
-                    { amount: "1/2", unit: "taza", name: "de salsa de soja." },
-                    { amount: "1/4", unit: "taza", name: "de azúcar moreno." },
-                    { amount: "2", unit: "cdas", name: "de aceite de sésamo." },
-                    { amount: "2", unit: "cdas", name: "de cebolla verde picada." },
-                    { amount: "2", unit: "", name: "dientes de ajo picados." },
-                    { amount: "1", unit: "cdta", name: "de jengibre fresco rallado." },
-                    { amount: "1/2", unit: "cdta", name: "de pimienta negra." },
-                    { amount: "", unit: "", name: "Semillas de sésamo tostado para decorar." }
-                ],
-                instructions: [
-                    "Lava y seca las costillas.",
-                    "Mezcla soja, azúcar, aceite de sésamo, cebolla verde, ajo, jengibre y pimienta para el marinado.",
-                    "Marina las costillas en refrigeración por al menos 4 horas o toda la noche.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca las costillas en la zona indirecta y cocina 1-1.5 horas, volteando y aplicando más marinado cada 20 minutos.",
-                    "Verifica que la temperatura interna alcance los 71°C.",
-                    "Retira, espolvorea con semillas de sésamo y sirve."
-                ],
-                tips: 'Para un sabor más intenso, ralla un poco de pera asiática en el marinado. Las enzimas de la pera ayudan a ablandar la carne.'
-            },
-            {
-                id: 'receta-costillas-ciruela',
-                title: 'Costillas de Cerdo con Salsa de Ciruela',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/805060/ffffff?text=Costillas+con+Ciruela',
-                time: '2-2.5 horas',
-                timeMinutes: 135,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "2", unit: "racks", name: "de costillas de cerdo (aprox. 1.5 kg c/u)." },
-                    { amount: "1", unit: "taza", name: "de salsa de ciruela." },
-                    { amount: "1/4", unit: "taza", name: "de salsa de soja." },
-                    { amount: "2", unit: "cdas", name: "de miel." },
-                    { amount: "2", unit: "cdta", name: "de jengibre fresco rallado." },
-                    { amount: "1", unit: "cdta", name: "de ajo picado." },
-                    { amount: "1/2", unit: "cdta", name: "de pimienta roja triturada (opcional)." }
-                ],
-                instructions: [
-                    "Lava y seca las costillas.",
-                    "Mezcla salsa de ciruela, soja, miel, jengibre, ajo y pimienta roja (si se usa).",
-                    "Aplica la mezcla sobre las costillas y marina al menos 1 hora en refrigeración.",
-                    "Precalienta el barril a 149°C.",
-                    "Coloca las costillas en la zona indirecta y cocina 2-2.5 horas, volteando y aplicando más salsa cada 30 minutos.",
-                    "Verifica que la temperatura interna alcance los 71°C.",
-                    "Retira, corta y sirve con más salsa."
-                ],
-                tips: 'La salsa de ciruela (a menudo usada en cocina asiática) puede ser espesa. Puedes aligerarla con un chorrito de vinagre de arroz.'
-            },
-            {
-                id: 'receta-chicharron-crujiente',
-                title: 'Chicharrón al Barril Crujiente',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/e6c9a1/4a2d1f?text=Chicharrón+Crujiente',
-                time: '1-2 horas',
-                timeMinutes: 90,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "1", unit: "kg", name: "de piel de cerdo, cortada en trozos pequeños." },
-                    { amount: "2", unit: "cdas", name: "de sal gruesa." },
-                    { amount: "1", unit: "cdta", name: "de pimienta negra molida." },
-                    { amount: "1", unit: "cdta", name: "de pimentón ahumado." },
-                    { amount: "", unit: "", name: "Aceite vegetal para freír." }
-                ],
-                instructions: [
-                    "Lava y seca cuidadosamente la piel de cerdo.",
-                    "Mezcla sal, pimienta y pimentón ahumado.",
-                    "Espolvorea y frota las especias sobre la piel.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca la piel en la zona indirecta y cocina 1-2 horas hasta que esté crujiente y dorada, girando ocasionalmente.",
-                    "Retira y escurre sobre papel absorbente.",
-                    "Calienta aceite vegetal en una sartén grande a 180°C.",
-                    "Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.",
-                    "Escurre el exceso de aceite y sirve caliente."
-                ],
-                tips: 'El secreto del chicharrón es que la piel esté MUY seca. Déjala secar en la nevera sin tapar durante unas horas antes de cocinarla.'
-            },
-            {
-                id: 'receta-chicharron-limon',
-                title: 'Chicharrón al Barril con Sabor a Limón y Chile',
-                category: 'cerdo',
-                image: 'https://placehold.co/400x200/f5d576/4a2d1f?text=Chicharrón+Limón+y+Chile',
-                time: '1-2 horas',
-                timeMinutes: 90,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "1", unit: "kg", name: "de piel de cerdo, cortada en tiras delgadas." },
-                    { amount: "2", unit: "", name: "limones (jugo y ralladura)." },
-                    { amount: "2", unit: "cdas", name: "de sal." },
-                    { amount: "1", unit: "cda", name: "de chile en polvo." },
-                    { amount: "1", unit: "cdta", name: "de ajo en polvo." },
-                    { amount: "1", unit: "cdta", name: "de comino molido." },
-                    { amount: "", unit: "", name: "Aceite vegetal para freír." }
-                ],
-                instructions: [
-                    "Lava y seca las tiras de piel.",
-                    "Mezcla jugo y ralladura de limón, sal, chile en polvo, ajo en polvo y comino.",
-                    "Marina la piel en la mezcla por al menos 30 minutos en refrigeración.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca las tiras en la zona indirecta y cocina 1-2 horas hasta que estén crujientes y doradas, girando ocasionalmente.",
-                    "Retira y escurre sobre papel absorbente.",
-                    "Calienta aceite vegetal a 180°C.",
-                    "Fríe los chicharrones 1-2 minutos hasta que estén completamente crujientes.",
-                    "Escurre el exceso de aceite y sirve caliente con rodajas de limón."
-                ],
-                tips: 'No añadas la ralladura de limón hasta el final (después de freír) para un sabor a limón más fresco, ya que puede quemarse.'
-            },
-            {
-                id: 'receta-pescado-limon',
-                title: 'Pescado al Barril con Salsa de Hierbas y Limón',
-                category: 'pescado',
-                image: 'https://placehold.co/400x200/bde0fe/4a2d1f?text=Pescado+al+Barril',
-                time: '15-20 min',
-                timeMinutes: 18,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "filetes", name: "de pescado (aprox. 150 g c/u), como lubina o trucha." },
-                    { amount: "2", unit: "", name: "limones (jugo y ralladura)." },
-                    { amount: "3", unit: "cdas", name: "de aceite de oliva." },
-                    { amount: "2", unit: "", name: "dientes de ajo, picados." },
-                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
-                    { amount: "1", unit: "cdta", name: "de tomillo fresco." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Mezcla jugo y ralladura de limón, aceite de oliva, ajo, perejil, tomillo, sal y pimienta.",
-                    "Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.",
-                    "Sirve con un poco de la salsa por encima."
-                ],
-                tips: 'El pescado se cocina muy rápido. Estará listo cuando se desmenuce fácilmente con un tenedor. No lo dejes ni un minuto de más.'
-            },
-            {
-                id: 'receta-pescado-mantequilla',
-                title: 'Pescado al Barril con Salsa de Mantequilla y Hierbas',
-                category: 'pescado',
-                image: 'https://placehold.co/400x200/cddfa0/4a2d1f?text=Pescado+con+Mantequilla',
-                time: '15-20 min',
-                timeMinutes: 18,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "filetes", name: "de pescado (aprox. 150 g c/u), como salmón o trucha." },
-                    { amount: "1/2", unit: "taza", name: "(115 g) de mantequilla derretida." },
-                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
-                    { amount: "2", unit: "cdas", name: "de cilantro fresco picado." },
-                    { amount: "1", unit: "cda", name: "de estragón fresco picado." },
-                    { amount: "2", unit: "cdta", name: "de jugo de limón." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Mezcla mantequilla derretida, perejil, cilantro, estragón, jugo de limón, sal y pimienta.",
-                    "Coloca los filetes en una bandeja y vierte la mezcla sobre ellos. Marina 30 minutos en refrigeración.",
-                    "Precalienta el barril a 177°C.",
-                    "Coloca los filetes en la zona indirecta y cocina 8-10 minutos, volteando una vez, hasta que estén tiernos.",
-                    "Sirve con un poco de la salsa por encima."
-                ],
-                tips: 'Para salmón, considera cocinarlo sobre una tabla de cedro (remojada previamente) en la parrilla para un sabor ahumado extra.'
-            },
-            // --- ACOMPAÑAMIENTOS ---
-            {
-                id: 'receta-pure-ahumado',
-                title: 'Puré de Papas Ahumadas',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/f0e6d2/4a2d1f?text=Puré+de+Papas+Ahumado',
-                time: '45 min',
-                timeMinutes: 45,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "", name: "papas grandes, peladas y en cubos." },
-                    { amount: "1/2", unit: "taza", name: "de leche caliente." },
-                    { amount: "2", unit: "cdas", name: "de mantequilla." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Cocina las papas en agua con sal hasta que estén tiernas. Escúrrelas.",
-                    "Precalienta el barril a baja temperatura y agrega astillas de madera de manzana.",
-                    "Coloca las papas en una fuente resistente al fuego y ahúmalas en el barril por 15-20 minutos, revolviendo ocasionalmente.",
-                    "Haz un puré con las papas ahumadas, agregando leche caliente, mantequilla, sal y pimienta. Mezcla hasta obtener consistencia suave."
-                ],
-                tips: 'Usa una madera de sabor suave como manzano o cerezo para ahumar las papas. Maderas fuertes como el mezquite pueden ser demasiado intensas.'
-            },
-            {
-                id: 'receta-ensalada-col',
-                title: 'Ensalada de Col Rizada con Vinagreta',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/55a630/ffffff?text=Ensalada+de+Col+Rizada',
-                time: '10 min',
-                timeMinutes: 10,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "tazas", name: "de col rizada, lavada y picada." },
-                    { amount: "1/4", unit: "taza", name: "de pasas." },
-                    { amount: "1/4", unit: "taza", name: "de nueces tostadas." },
-                    { amount: "", unit: "", name: "Para la vinagreta:", isSubheader: true },
-                    { amount: "2", unit: "cdas", name: "de aceite de oliva.", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de vinagre de sidra de manzana.", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de mostaza Dijon.", isSubItem: true },
-                    { amount: "1", unit: "cda", name: "de miel.", isSubItem: true },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto.", isSubItem: true }
-                ],
-                instructions: [
-                    "En un tazón grande, combina la col rizada, pasas y nueces.",
-                    "En otro tazón, mezcla los ingredientes de la vinagreta.",
-                    "Vierte la vinagreta sobre la ensalada y mezcla bien."
-                ],
-                tips: 'La col rizada (kale) puede ser dura. "Masajea" la col con la vinagreta usando tus manos durante 1-2 minutos para ablandar las hojas.'
-            },
-            {
-                id: 'receta-salsa-bbq',
-                title: 'Salsa Barbacoa Casera',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/8f250c/ffffff?text=Salsa+Barbacoa',
-                time: '15 min',
-                timeMinutes: 15,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "1", unit: "taza", name: "de kétchup." },
-                    { amount: "1/4", unit: "taza", name: "de vinagre de sidra de manzana." },
-                    { amount: "2", unit: "cdas", name: "de azúcar moreno." },
-                    { amount: "1", unit: "cda", name: "de mostaza Dijon." },
-                    { amount: "1", unit: "cdta", name: "de salsa Worcestershire." },
-                    { amount: "1", unit: "cdta", name: "de pimentón ahumado." },
-                    { amount: "1/2", unit: "cdta", name: "de ajo en polvo." },
-                    { amount: "1/2", unit: "cdta", name: "de cebolla en polvo." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Combina todos los ingredientes en una cacerola a fuego medio.",
-                    "Lleva a ebullición, reduce el fuego y cocina a fuego lento 10-15 minutos, removiendo, hasta que espese.",
-                    "Deja enfriar antes de usar."
-                ],
-                tips: 'Para una salsa más compleja, añade 1/4 de taza de bourbon o ron oscuro durante la cocción.'
-            },
-            {
-                id: 'receta-maiz-parrilla',
-                title: 'Maíz a la Parrilla con Mantequilla de Hierbas',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/fde047/4a2d1f?text=Maíz+a+la+Parrilla',
-                time: '20 min',
-                timeMinutes: 20,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "mazorcas", name: "de maíz, con hojas." },
-                    { amount: "4", unit: "cdas", name: "de mantequilla derretida." },
-                    { amount: "2", unit: "cdas", name: "de perejil fresco picado." },
-                    { amount: "2", unit: "cdas", name: "de cebollín fresco picado." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Remoja las mazorcas en agua por al menos 30 minutos.",
-                    "Precalienta el barril a temperatura media-alta.",
-                    "Asa las mazorcas directamente en la parrilla, girando, por 10-15 minutos o hasta que estén tiernas y doradas.",
-                    "Mezcla la mantequilla derretida, perejil, cebollín, sal y pimienta.",
-                    "Cepilla el maíz con la mantequilla de hierbas antes de servir."
-                ],
-                tips: 'No quites todas las hojas del maíz. Tira de ellas hacia atrás, quita los pelos, unta el maíz con mantequilla de hierbas y vuelve a cerrar las hojas. Asa el maíz envuelto en sus propias hojas.'
-            },
-            {
-                id: 'receta-esparragos',
-                title: 'Espárragos a la Parrilla con Limón y Parmesano',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/84cc16/ffffff?text=Espárragos',
-                time: '10 min',
-                timeMinutes: 10,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "1", unit: "manojo", name: "de espárragos frescos." },
-                    { amount: "2", unit: "cdas", name: "de aceite de oliva." },
-                    { amount: "1", unit: "", name: "limón (jugo y ralladura)." },
-                    { amount: "1/4", unit: "taza", name: "de queso parmesano rallado." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Lava y recorta los extremos leñosos de los espárragos.",
-                    "Mezcla aceite de oliva, jugo y ralladura de limón, parmesano, sal y pimienta.",
-                    "Cepilla los espárragos con esta mezcla.",
-                    "Asa en la parrilla del barril por 5-7 minutos, girando, hasta que estén tiernos y ligeramente dorados.",
-                    "Sirve con más ralladura de limón y parmesano."
-                ],
-                tips: 'Añade el queso parmesano solo en el último minuto de cocción, o se quemará y amargará.'
-            },
-            {
-                id: 'receta-ensalada-tomate',
-                title: 'Ensalada de Tomate y Mozzarella con Albahaca',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/ef4444/ffffff?text=Ensalada+Tomate+Mozzarella',
-                time: '5 min',
-                timeMinutes: 5,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "", name: "tomates medianos, en rodajas." },
-                    { amount: "200", unit: "g", name: "de queso mozzarella fresco, en rodajas." },
-                    { amount: "", unit: "", name: "Hojas frescas de albahaca." },
-                    { amount: "2", unit: "cdas", name: "de aceite de oliva virgen extra." },
-                    { amount: "", unit: "", name: "Vinagre balsámico." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Alterna las rodajas de tomate y mozzarella en un plato.",
-                    "Coloca hojas de albahaca entre las rodajas.",
-                    "Rocía con aceite de oliva, vinagre balsámico, sal y pimienta.",
-                    "Deja reposar unos minutos antes de servir."
-                ],
-                tips: 'Usa tomates de buena calidad y a temperatura ambiente, nunca fríos de la nevera. Sazona los tomates con sal *antes* de añadir la mozzarella.'
-            },
-            {
-                id: 'receta-papas-hasselback',
-                title: 'Papas Hasselback con Hierbas y Queso',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/f5cb5c/4a2d1f?text=Papas+Hasselback',
-                time: '1 hora',
-                timeMinutes: 60,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "4", unit: "", name: "papas medianas." },
-                    { amount: "4", unit: "cdas", name: "de mantequilla derretida." },
-                    { amount: "2", unit: "cdas", name: "de romero fresco picado." },
-                    { amount: "1/4", unit: "taza", name: "de queso cheddar rallado." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Lava las papas y córtalas en rodajas finas sin llegar al fondo.",
-                    "Precalienta el barril a 204°C.",
-                    "Coloca las papas en una fuente resistente al fuego.",
-                    "Mezcla la mantequilla derretida con romero, sal y pimienta. Cepilla sobre las papas.",
-                    "Hornea en el barril por 45-60 minutos, o hasta que estén tiernas y doradas.",
-                    "Espolvorea el queso cheddar y hornea unos minutos más hasta que se derrita."
-                ],
-                tips: 'Para cortar las papas fácilmente sin llegar al fondo, colócalas entre dos palillos chinos o mangos de cucharas de madera.'
-            },
-            {
-                id: 'receta-yuca-frita',
-                title: 'Yuca Frita con Mojo',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/ffe8d6/4a2d1f?text=Yuca+Frita+con+Mojo',
-                time: '45 min',
-                timeMinutes: 45,
-                difficulty: 'Media',
-                difficultyValue: 2,
-                ingredients: [
-                    { amount: "2", unit: "", name: "yucas medianas, peladas y en tiras." },
-                    { amount: "", unit: "", name: "Aceite vegetal para freír." },
-                    { amount: "", unit: "", name: "Sal al gusto." },
-                    { amount: "", unit: "", name: "Para el Mojo:", isSubheader: true },
-                    { amount: "4", unit: "", name: "dientes de ajo, picados finamente.", isSubItem: true },
-                    { amount: "1/2", unit: "taza", name: "de aceite de oliva.", isSubItem: true },
-                    { amount: "1/4", unit: "taza", name: "de jugo de limón.", isSubItem: true },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto.", isSubItem: true }
-                ],
-                instructions: [
-                    "Hierve las tiras de yuca en agua con sal hasta que estén tiernas (20-25 min). Escurre y deja enfriar.",
-                    "Precalienta el barril a 190°C para freír (o usa sartén con aceite).",
-                    "Fríe las tiras de yuca hasta que estén doradas y crujientes. Escurre y sazona con sal.",
-                    "Para el mojo: Calienta aceite de oliva, agrega el ajo y cocina a fuego lento hasta que esté dorado.",
-                    "Retira del fuego y mezcla el ajo dorado con jugo de limón, sal y pimienta.",
-                    "Sirve la yuca caliente con el mojo."
-                ],
-                tips: 'Para una yuca extra crujiente, congela las tiras de yuca *después* de hervirlas y enfriarlas. Fríelas directamente desde congeladas.'
-            },
-            {
-                id: 'receta-pure-yuca',
-                title: 'Puré de Yuca con Queso',
-                category: 'acompanamiento',
-                image: 'https://placehold.co/400x200/fff4e6/4a2d1f?text=Puré+de+Yuca',
-                time: '30 min',
-                timeMinutes: 30,
-                difficulty: 'Fácil',
-                difficultyValue: 1,
-                ingredients: [
-                    { amount: "2", unit: "", name: "yucas medianas, peladas y en trozos." },
-                    { amount: "1/2", unit: "taza", name: "de queso crema." },
-                    { amount: "1/4", unit: "taza", name: "de leche caliente." },
-                    { amount: "2", unit: "cdas", name: "de mantequilla." },
-                    { amount: "", unit: "", name: "Sal y pimienta al gusto." }
-                ],
-                instructions: [
-                    "Hierve la yuca en agua con sal hasta que esté tierna (20-25 min). Escurre.",
-                    "En un tazón, mezcla la yuca, queso crema, leche caliente y mantequilla.",
-                    "Usa un machacador o procesador para hacer un puré suave.",
-                    "Sazona con sal y pimienta. Sirve caliente."
-                ],
-                tips: 'Asegúrate de quitar la hebra central (fibrosa) de la yuca después de hervirla y antes de hacer el puré.'
+                categories: [
+                    { id: 'all', name: 'Todo' }, { id: 'empanadas', name: '🥟 Empanadas' }, { id: 'pasteles', name: '🥠 Pasteles' },
+                    { id: 'arepas', name: '🍳 Arepas Huevo' }, { id: 'carimanolas', name: '🥔 Carimañolas' }, { id: 'bunuelos', name: '🧀 Buñuelos' },
+                    { id: 'otros', name: '🍌 Otros' }, { id: 'salsas', name: '🥣 Salsas y Aderezos' }
+                ]
             }
+        };
+
+        // ==========================================
+        // BASE DE DATOS COMPLETA DE RECETAS
+        // ==========================================
+        const FULL_RECIPES = [
+            // --- MERMELADAS (50 Recetas - Grazie Canella) ---
+            { module: 'jams', category: 'basicas', name: 'Pectina de Manzana Casera', time: '45m', diff: 'Media', prep: ['Lavar y cortar manzanas en cuartos (con piel y semillas).', 'Colocar los trozos en una olla profunda y añadir el agua.', 'Cocinar a fuego medio durante 30-40 minutos.', 'Verter la pulpa caliente sobre un colador forrado con gasa.', 'Dejar escurrir toda la noche SIN presionar.', 'Hervir el líquido resultante para concentrarlo.'], ing: ['1 kg de manzanas (Granny Smith)', '1 litro de agua'], secret: 'Base para mermeladas bajas en pectina.', tags: ['vegano', 'base'] },
+            { module: 'jams', category: 'basicas', name: 'Pectina de Maracuyá', time: '45m', diff: 'Media', prep: ['Lavar maracuyás, cortar y retirar pulpa.', 'Cocinar cáscaras en olla a presión con agua 15 min.', 'Raspar la parte blanca interior (albedo).', 'Licuar la parte blanca con un poco de agua de cocción.', 'Pasar por colador fino.'], ing: ['Cáscaras de 6 maracuyás', 'Agua necesaria'], secret: 'Espesante neutro potente.', tags: ['vegano', 'base'] },
+            { module: 'jams', category: 'variadas', name: 'Mermelada de Mora', time: '20m', diff: 'Media', prep: ['Lavar moras delicadamente.', 'Macerar con azúcar 30 min en nevera.', 'Cocinar en olla de fondo grueso con limón.', 'Retirar espuma.', 'Cocinar hasta 105°C.'], ing: ['1 kg moras maduras', '400g azúcar', '15 ml limón'], secret: 'Añadir 3 hojas de laurel secas durante cocción.', tags: ['clásico', 'vegano'] },
+            { module: 'jams', category: 'variadas', name: 'Acerola', time: '35m', diff: 'Media', prep: ['Licuar acerolas vel baja (no romper semilla).', 'Colar.', 'Mezclar jugo con manzana rallada y azúcar.', 'Cocinar hasta espesar.'], ing: ['1 kg acerola', '2 manzanas', '400g azúcar', '240ml agua', '1/2 limón'], secret: '1 cda jengibre rallado.', tags: ['exótico', 'vegano'] },
+            { module: 'jams', category: 'variadas', name: 'Carambola', time: '40m', diff: 'Fácil', prep: ['Quitar bordes oscuros.', 'Licuar fruta pura.', 'Cocinar con azúcar y limón.', 'Fuego lento hasta dorado.'], ing: ['1 kg carambola', '400g azúcar', '15ml limón'], secret: '4 chiles jalapeños para versión picante.', tags: ['exótico'] },
+            { module: 'jams', category: 'variadas', name: 'Mandarina', time: '35m', diff: 'Media', prep: ['Pelar, quitar TODA parte blanca.', 'Sacar semillas.', 'Machacar pulpa.', 'Cocinar con azúcar y limón.'], ing: ['1 kg mandarina', '200g azúcar', '1/2 limón'], secret: 'Infusionar azúcar con romero.', tags: ['cítrico'] },
+            { module: 'jams', category: 'variadas', name: 'Durazno', time: '35m', diff: 'Media', prep: ['Escaldar, pelar, cortar cubos.', 'Rallar manzana.', 'Cocinar todo junto hasta traslúcido.'], ing: ['1 kg durazno', '400g azúcar', '1 manzana', '1/2 limón'], secret: 'Infusión lavanda por agua.', tags: ['clásico'] },
+            { module: 'jams', category: 'variadas', name: 'Albaricoque', time: '40m', diff: 'Media', prep: ['Hidratar secos 1h o usar frescos deshuesados.', 'Cocinar con agua y azúcar fuego medio.', 'Dejar deshacer fruta.'], ing: ['1 kg albaricoques', '400g azúcar', '720ml agua'], secret: '1 cda agua de rosas al final.', tags: ['gourmet'] },
+            { module: 'jams', category: 'variadas', name: 'Cereza', time: '30m', diff: 'Media', prep: ['Deshuesar (guardar 15 huesos).', 'Romper huesos, sacar almendra interior.', 'Poner almendras en gasa.', 'Cocinar cerezas, azúcar, limón y bolsita.', 'Retirar bolsa al final.'], ing: ['1 kg cerezas', '400g azúcar', '1 limón'], secret: 'Almendra del hueso da sabor amaretto.', tags: ['gourmet'] },
+            { module: 'jams', category: 'variadas', name: 'Mango', time: '25m', diff: 'Fácil', prep: ['Pelar y cortar cubos.', 'Hacer almíbar ligero agua/azúcar.', 'Añadir mango y limón.', 'Cocinar hasta blando brillante.', 'Machacar un poco.'], ing: ['3 mangos', '300g azúcar', '240ml agua', '1 limón'], secret: 'Cardamomo o almendras.', tags: ['tropical'] },
+            { module: 'jams', category: 'mixtas', name: 'Frutas Rojas', time: '35m', diff: 'Media', prep: ['Macerar mix con azúcar 1h.', 'Rallar manzana.', 'Cocinar todo retirando espuma.', 'Reducir a color rubí.'], ing: ['600g mix rojos', '200g azúcar', '1 manzana', '1/2 limón'], secret: 'Bayas enebro o albahaca.', tags: ['clásico'] },
+            { module: 'jams', category: 'mixtas', name: 'Albaricoque Maracuyá', time: '50m', diff: 'Media', prep: ['Cocinar albaricoque tierno.', 'Añadir pulpa maracuyá y azúcar.', 'Dar punto espesor.'], ing: ['200g albaricoque', '2 maracuyás', '200g azúcar'], secret: 'Coco rallado fresco.', tags: ['tropical', 'agridulce'] },
+            { module: 'jams', category: 'mixtas', name: 'Piña Pera Limón', time: '45m', diff: 'Media', prep: ['Licuar piña (sin colar).', 'Picar peras cubitos.', 'Cocinar juntas con azúcar/limón.', 'Fuego medio-bajo hasta espesar.'], ing: ['1 piña', '6 peras', '700g azúcar', '2 limones'], secret: 'Semillas vainilla.', tags: ['tropical'] },
+            { module: 'jams', category: 'mixtas', name: 'Pimiento y Naranja', time: '35m', diff: 'Media', prep: ['Lavar y picar pimientos.', 'Exprimir naranjas.', 'Licuar pimientos con jugo.', 'Cocinar con azúcar.', 'Hasta consistencia jalea.'], ing: ['Jugo de 4 naranjas', '500g pimiento amarillo', '400g de azúcar', 'Jugo de 1/2 limón'], secret: 'Añadir anís estrellado.', tags: ['acompañamiento'] },
+            { module: 'jams', category: 'mixtas', name: 'Fresa Pimienta', time: '35m', diff: 'Fácil', prep: ['Picar fresas y chiles.', 'Macerar con azúcar 30 min.', 'Cocinar fuego medio.', 'Picante baja con calor.'], ing: ['1 kg fresas', '3 chiles rojos', '400g azúcar', '1 limón'], secret: 'Rama canela y anís en cocción.', tags: ['picante'] },
+            { module: 'jams', category: 'mixtas', name: 'Higo con Limón', time: '90m', diff: 'Difícil', prep: ['Cortar limones finos.', 'Remojar 24h cambiando agua.', 'Picar higos.', 'Cocinar todo junto.', 'Fuego muy lento.'], ing: ['500g higos', '3 limones amarillos', '500g de azúcar'], secret: 'Añadir pimienta negra entera.', tags: ['gourmet'] },
+            { module: 'jams', category: 'salados', name: 'Tocino (Bacon Jam)', time: '60m', diff: 'Media', prep: ['Freír tocino, reservar.', 'Sofreír cebolla/ajo en grasa.', 'Añadir café, vinagre, whisky, azúcar.', 'Hervir 2 min.', 'Cocinar lento hasta jarabe.'], ing: ['500g tocino', '1 cebolla', '1 taza café', '1/2 taza vinagre', '100g azúcar', 'Whisky'], secret: 'Piña para contraste.', tags: ['carnes'] },
+            { module: 'jams', category: 'salados', name: 'Menta (Jelly)', time: '70m', diff: 'Difícil', prep: ['Hervir manzana y menta 30 min.', 'Colar sin presionar.', 'Medir líquido.', 'Cocinar líquido con azúcar.', 'Añadir menta picada al final.'], ing: ['1 kg manzana', '2 manojos menta', 'Azúcar', '1 limón'], secret: 'Añadir anís estrellado.', tags: ['cordero'] },
+            { module: 'jams', category: 'salados', name: 'Jengibre', time: '35m', diff: 'Fácil', prep: ['Pelar manzanas y jengibre.', 'Licuar manzanas con agua, limón, jengibre.', 'Cocinar puré con azúcar.', 'Hasta espesar.'], ing: ['600g manzanas', '3 cdas jengibre', '300g azúcar', 'Jugo de 1 limón'], secret: 'Añadir salsa de soja.', tags: ['picante'] },
+            { module: 'jams', category: 'salados', name: 'Tomate con Chile', time: '35m', diff: 'Fácil', prep: ['Escaldar y pelar tomates.', 'Picar tomates y chile.', 'Cocinar con azúcar y limón.', 'Fuego lento.'], ing: ['1 kg tomate maduro', 'Chile rojo', '400g azúcar', 'Jugo de 1 limón'], secret: 'Añadir Haba Tonka.', tags: ['agridulce'] },
+            { module: 'jams', category: 'salados', name: 'Ajo Confitado', time: '35m', diff: 'Media', prep: ['Blanquear ajos 3 veces.', 'Rallar manzana.', 'Cocinar ajos, manzana, vinagre, vino, azúcar.', 'Fuego lento hasta tierno.'], ing: ['350g ajos', '300g azúcar', '1/2 taza vinagre', '1/2 taza vino', '1 manzana'], secret: 'Añadir bayas de enebro.', tags: ['gourmet'] },
+            { module: 'jams', category: 'flores', name: 'Jazmín', time: '60m', diff: 'Media', prep: ['Infusión concentrada jazmín.', 'Colar bien.', 'Pelar y rallar manzanas.', 'Cocinar infusión, manzana, azúcar.', 'Hasta espesar.'], ing: ['1 taza flores jazmín', '1 kg manzanas', '400g azúcar', 'Jugo de limón'], secret: 'Contrasta con jengibre.', tags: ['floral'] },
+            { module: 'jams', category: 'flores', name: 'Hibisco y Arándanos', time: '45m', diff: 'Media', prep: ['Infusión fuerte hibisco.', 'Licuar manzana con infusión.', 'Cocinar con azúcar y arándanos.', 'Fuego medio.'], ing: ['20g hibisco', '2 manzanas', '300g azúcar', '120g arándanos', 'Jugo de 1 limón'], secret: 'Sustituir agua por agua de rosas.', tags: ['floral', 'antioxidante'] },
+            { module: 'jams', category: 'flores', name: 'Rosas', time: '40m', diff: 'Difícil', prep: ['Cortar base blanca pétalos.', 'Preparar pectina manzana.', 'Cocinar pétalos, agua, azúcar, limón, pectina.', 'Fuego suave.'], ing: ['Pétalos 12 rosas', '500g azúcar', '1 taza pectina', '1 limón'], secret: 'Combinar con frambuesas.', tags: ['gourmet', 'floral'] },
+            { module: 'jams', category: 'legumbres', name: 'Calabaza', time: '90m', diff: 'Media', prep: ['Cocinar calabaza, hacer puré.', 'Cocinar con azúcar, naranja, especias.', 'Remover hasta desprender del fondo.'], ing: ['1.5 kg calabaza', '600g azúcar', '1 naranja', 'Canela'], secret: 'Vaina vainilla real.', tags: ['vegano'] },
+            { module: 'jams', category: 'gourmet', name: 'Limón Siciliano', time: '20m', diff: 'Difícil', prep: ['Cortar limones finos.', 'Remojar 48h cambiando agua.', 'Escurrir.', 'Cocinar con azúcar hasta translúcido.'], ing: ['1 kg limones', '500g azúcar', 'Agua remojar'], secret: 'Mezclar con peras.', tags: ['gourmet'] },
+            { module: 'jams', category: 'gourmet', name: 'Sandía', time: '40m', diff: 'Media', prep: ['Usar pulpa roja picada.', 'Hervir 20 min, enfriar.', 'Hervir 20 min, enfriar.', 'Añadir limón, hervir hasta punto.'], ing: ['1 kg sandía', '600g azúcar', 'Jugo de 1 limón'], secret: 'Perfumar con vainilla.', tags: ['gourmet'] },
+            { module: 'jams', category: 'gourmet', name: 'Physalis (Uchuva)', time: '35m', diff: 'Fácil', prep: ['Lavar uchuvas.', 'Cocinar con azúcar y agua.', 'Fuego medio.', 'Frutas explotan.'], ing: ['500g physalis', '200g azúcar', '50 ml agua'], secret: 'Sustituir agua por naranja.', tags: ['exótico'] },
+            { module: 'jams', category: 'gourmet', name: 'Pitahaya', time: '50m', diff: 'Media', prep: ['Sacar pulpa.', 'Hervir cáscara rosa limpia.', 'Licuar cáscara.', 'Mezclar todo con azúcar y limón.', 'Cocinar.'], ing: ['1.5 kg pitahaya', '700g azúcar', 'Jugo de 1 limón'], secret: 'Sustituir 1/3 con mango.', tags: ['exótico'] },
+            { module: 'jams', category: 'gourmet', name: 'Granada', time: '40m', diff: 'Media', prep: ['Desgranar granadas.', 'Licuar brevemente y colar.', 'Mezclar jugo, manzana rallada, azúcar.', 'Cocinar.'], ing: ['2 granadas', '2 manzanas', '300g azúcar', 'Jugo 1 limón'], secret: 'Añadir canela y anís.', tags: ['gourmet'] },
+            { module: 'jams', category: 'gourmet', name: 'Arándano (Blueberry)', time: '30m', diff: 'Media', prep: ['Macerar arándanos 15 min.', 'Cocinar aplastando algunos.', 'Cocinar hasta espesar.'], ing: ['1 kg arándanos', '400g azúcar', 'Jugo 1 limón'], secret: 'Cocinar con menta fresca.', tags: ['clásico'] },
+            { module: 'jams', category: 'exoticas', name: 'Néspera (Níspero)', time: '50m', diff: 'Media', prep: ['Pelar y cortar nésperas.', 'Macerar con azúcar y limón 30 min.', 'Cocinar hasta deshacer.', 'Añadir agua si seca.'], ing: ['1 kg nésperas', '400g azúcar', 'Jugo 1 limón'], secret: 'Añadir canela.', tags: ['exótico'] },
+            { module: 'jams', category: 'exoticas', name: 'Asaí', time: '30m', diff: 'Fácil', prep: ['Descongelar pulpa.', 'Mezclar con manzana rallada.', 'Cocinar con azúcar y limón.'], ing: ['500g asaí', '1 manzana', '200g azúcar', 'Jugo 1 limón'], secret: 'Añadir jengibre.', tags: ['tropical'] },
+            { module: 'jams', category: 'exoticas', name: 'Tamarindo', time: '40m', diff: 'Media', prep: ['Hervir tamarindos.', 'Colar pulpa.', 'Cocinar pulpa con azúcar.', 'Hasta punto mermelada.'], ing: ['1 kg tamarindo', '400g azúcar', 'Agua'], secret: 'Infusionar menta.', tags: ['agridulce'] },
+            { module: 'jams', category: 'exoticas', name: 'Guanábana', time: '40m', diff: 'Media', prep: ['Retirar semillas negras.', 'Cocinar pulpa con azúcar y limón.', 'Remover fuerte.'], ing: ['500g pulpa', '200g azúcar', '1 limón'], secret: 'Añadir chile.', tags: ['tropical'] },
+            { module: 'jams', category: 'exoticas', name: 'Kinkan (Naranja Japonesa)', time: '35m', diff: 'Media', prep: ['Hervir naranjas 3 veces.', 'Cortar y quitar semillas.', 'Procesar.', 'Cocinar con azúcar.'], ing: ['1 kg kinkan', '400g azúcar', 'Jugo 1 limón'], secret: 'Añadir cardamomo.', tags: ['exótico'] },
+            { module: 'jams', category: 'alcohol', name: 'Uva con Vino Blanco', time: '60m', diff: 'Difícil', prep: ['Hacer pectina manzana/uva.', 'Colar.', 'Mezclar con vino y azúcar.', 'Cocinar hasta gelificar.'], ing: ['500g uvas', '500g manzana', 'Vino blanco', 'Azúcar'], secret: 'Añadir pimienta.', tags: ['adultos'] },
+            { module: 'jams', category: 'alcohol', name: 'Plátano con Ron', time: '30m', diff: 'Fácil', prep: ['Hacer almíbar.', 'Añadir puré plátano.', 'Cocinar.', 'Añadir ron al final.'], ing: ['500g plátanos', '160g azúcar', '1 shot Ron', 'Jugo 1/2 limón'], secret: 'Añadir coco.', tags: ['tropical', 'adultos'] },
+            { module: 'jams', category: 'alcohol', name: 'Vino Tinto', time: '50m', diff: 'Fácil', prep: ['Reducir vino mitad.', 'Añadir manzana y azúcar.', 'Espesar.'], ing: ['750ml vino tinto', '2 manzanas', '500g azúcar'], secret: 'Infusionar romero.', tags: ['adultos', 'gourmet'] },
+            { module: 'jams', category: 'alcohol', name: 'Cachaza con Limón', time: '60m', diff: 'Media', prep: ['Hacer puré manzana.', 'Mezclar con limón y azúcar.', 'Cocinar.', 'Añadir cachaza al final.'], ing: ['1 kg manzana', '240ml cachaza', '500g azúcar', 'Jugo 2 limones'], secret: 'Añadir menta.', tags: ['adultos', 'fiesta'] },
+            { module: 'jams', category: 'fit', name: 'Piña Fit', time: '60m', diff: 'Difícil', prep: ['Preparar pectina.', 'Picar piña.', 'Cocinar piña, pectina, edulcorante.', 'Fuego bajo.'], ing: ['1 piña', '3 manzanas', '300g Edulcorante'], secret: 'Infusión hierba luisa.', tags: ['fit', 'sin azúcar'] },
+            { module: 'jams', category: 'fit', name: 'Fresa Fit', time: '40m', diff: 'Media', prep: ['Cocinar fresas con edulcorante.', 'Hidratar chía en naranja.', 'Añadir chía al final.'], ing: ['1 kg fresas', '300g Edulcorante', 'Jugo 1 naranja', '2 cdas Chía'], secret: 'Ralladura naranja.', tags: ['fit', 'sin azúcar'] },
+            { module: 'jams', category: 'fit', name: 'Blackcurrant (Grosella) Fit', time: '50m', diff: 'Media', prep: ['Separar pulpa/cáscara.', 'Hervir cáscaras, colar.', 'Cocinar pulpa, líquido, edulcorante.'], ing: ['1 kg grosellas', '300g Edulcorante', 'Jugo 1 limón'], secret: 'Añadir canela.', tags: ['fit', 'antioxidante'] },
+            { module: 'jams', category: 'fit', name: 'Pera y Kiwi Fit', time: '40m', diff: 'Media', prep: ['Hacer puré kiwi.', 'Cortar peras.', 'Mezclar frutas, pectina, edulcorante.', 'Cocinar.'], ing: ['1 kg peras', '4 kiwis', '350g Edulcorante', '1 taza Pectina'], secret: 'Añadir almendras.', tags: ['fit', 'detox'] },
+            { module: 'jams', category: 'fit', name: 'Cáscara de Sandía Fit', time: '90m', diff: 'Media', prep: ['Usar parte blanca picada.', 'Rallar manzana.', 'Cocinar todo lento hasta transparente.'], ing: ['600g cáscara', '200g Edulcorante', '1 manzana', 'Jugo 1 limón'], secret: 'Añadir jengibre.', tags: ['fit', 'reciclaje'] },
+            { module: 'jams', category: 'chutney', name: 'Chutney Cebolla Morada', time: '60m', diff: 'Media', prep: ['Cortar cebolla plumas.', 'Sofreír con chile.', 'Añadir azúcar, vinagre.', 'Cocinar lento hasta caramelizar.'], ing: ['1 kg cebolla', '100g azúcar', '200ml balsámico', '1 ají'], secret: 'Añadir salvia.', tags: ['acompañamiento'] },
+            { module: 'jams', category: 'chutney', name: 'Chutney de Ciruela', time: '45m', diff: 'Media', prep: ['Picar ciruelas, cebolla, ajo.', 'Poner todo en olla.', 'Cocinar hasta blando.', 'Añadir azúcar, reducir.'], ing: ['1 kg ciruelas', '1 cebolla', '200ml vinagre', '50g pasas', 'Especias'], secret: 'Usar pimentón.', tags: ['acompañamiento'] },
+            { module: 'jams', category: 'chutney', name: 'Chutney de Piña', time: '50m', diff: 'Media', prep: ['Picar piña.', 'Sofreír cebolla, ajo, jengibre.', 'Añadir piña, vinagre, especias.', 'Incorporar azúcar, cocinar.'], ing: ['1 piña', '1 cebolla', '1 trozo jengibre', 'Vinagre manzana'], secret: 'Añadir nuez moscada.', tags: ['acompañamiento'] },
+            // Extras para completar 50
+            { module: 'jams', category: 'variadas', name: 'Banana Vainilla', time: '30m', diff: 'Fácil', prep: ['Hacer puré de banana.', 'Cocinar con azúcar, limón y vainilla.', 'Añadir un poco de agua si espesa mucho.', 'Dejar enfriar antes de envasar.'], ing: ['1 kg bananas', '400g azúcar', 'Vainilla', 'Jugo de 1 limón'], secret: 'Un toque de ron al final.', tags: ['tropical'] },
+            { module: 'jams', category: 'mixtas', name: 'Kiwi Limón', time: '35m', diff: 'Media', prep: ['Pelar kiwis y cortar en trozos pequeños.', 'Cocinar con azúcar y ralladura de limón.', 'Espesar a fuego lento removiendo.', 'Hacer la prueba del plato frío.'], ing: ['1 kg kiwis', '500g azúcar', '2 limones'], secret: 'No triturar las semillas del kiwi.', tags: ['acido'] },
+
+            // --- FRITOS (Gourmet Genius - 60+ Recetas) ---
+            // Empanadas
+            { module: 'fritos', category: 'empanadas', name: 'Masa Básica de Maíz', time: '20m', diff: 'Fácil', prep: ['Mezclar harina, sal, azúcar en un tazón grande.', 'Añadir agua tibia poco a poco mezclando con la mano.', 'Agregar aceite y amasar 5 min vigorosamente hasta que no se pegue.', 'Formar bola, cubrir con plástico y reposar 15 min.'], ing: ['2 tazas harina maíz', '2 1/4 tazas agua tibia', '1 cdta sal', '1 cdta azúcar', '2 cdas aceite'], secret: 'Masajear grietas con agua tibia.', tags: ['base', 'maíz'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Carne', time: '45m', diff: 'Media', prep: ['Preparar guiso con carne molida, papa picada fina y hogao.', 'Cocinar hasta que la papa esté blanda pero no deshecha.', 'DEJAR ENFRIAR el relleno completamente.', 'Armar discos de masa, rellenar, cerrar y freír a 180°C.'], ing: ['Masa', 'Carne molida', 'Papa pastusa', 'Hogao'], secret: 'Relleno frío para que no rompa la masa.', tags: ['clásico'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Pollo', time: '45m', diff: 'Media', prep: ['Cocinar pechuga y desmechar finamente.', 'Mezclar con guiso de tomate y cebolla.', 'Armar las empanadas y freír hasta dorar.'], ing: ['Masa de maíz', 'Pechuga pollo', 'Guiso tomate/cebolla'], secret: 'Acompañar siempre con ají picante.', tags: ['clásico'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Queso', time: '30m', diff: 'Fácil', prep: ['Rallar queso costeño finamente.', 'Mezclar el queso con un poco de almidón de yuca.', 'Rellenar los discos y sellar haciendo presión fuerte en los bordes.', 'Freír en aceite muy caliente.'], ing: ['Masa', 'Queso costeño', 'Almidón agrio'], secret: 'El almidón evita que el queso se salga al fundirse.', tags: ['rápido'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Camarón', time: '45m', diff: 'Media', prep: ['Sofreír camarón picado rápidamente con ajo.', 'Mezclar con arroz cocido o puré de papa criolla.', 'Rellenar, cerrar y freír.'], ing: ['Masa', 'Camarón limpio', 'Ajo', 'Arroz/Papa'], secret: 'No sobrecocinar camarón en el sofrito.', tags: ['mar'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Champiñón', time: '40m', diff: 'Media', prep: ['Saltear hongos laminados con ajo y mantequilla.', 'Mezclar con espinaca blanqueada picada y queso.', 'Armar y freír.'], ing: ['Masa', 'Champiñón', 'Espinaca', 'Queso mozzarella'], secret: 'Espinaca bien seca para no aguar la masa.', tags: ['vege'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Chorizo', time: '40m', diff: 'Media', prep: ['Quitar la piel al chorizo y desmigajar.', 'Sofreír hasta que suelte la grasa.', 'Mezclar con puré de papa criolla.', 'Armar y freír.'], ing: ['Masa', 'Chorizo', 'Papa criolla'], secret: 'Usar chorizo santarrosano.', tags: ['carnes'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Atún', time: '35m', diff: 'Fácil', prep: ['Escurrir muy bien el atún en lata.', 'Mezclar con guiso seco de tomate y cebolla.', 'Armar y freír.'], ing: ['Masa', 'Atún en aceite', 'Guiso criollo'], secret: 'El relleno debe quedar pastoso, no líquido.', tags: ['rápido'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Plátano', time: '40m', diff: 'Media', prep: ['Hacer masa con plátano verde cocido machacado y un poco de harina maíz.', 'Extender, rellenar con queso o bocadillo.', 'Freír.'], ing: ['Plátano verde', 'Harina maíz', 'Queso'], secret: 'Usar aceite en las manos para manejar la masa pegajosa.', tags: ['dulce-salado'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Cerdo Piña', time: '45m', diff: 'Media', prep: ['Cocinar cerdo y desmechar.', 'Mezclar con piña calada en cubitos.', 'Armar y freír.'], ing: ['Masa', 'Carne de cerdo', 'Piña calada'], secret: 'Sabor hawaiano criollo.', tags: ['agridulce'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Portobello', time: '45m', diff: 'Media', prep: ['Saltear portobellos en cubos.', 'Mezclar con trozos de queso azul.', 'Armar y freír.'], ing: ['Masa', 'Portobello', 'Queso azul'], secret: 'Toque gourmet intenso.', tags: ['vege'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Pescado', time: '45m', diff: 'Media', prep: ['Desmenuzar pescado blanco cocido.', 'Mezclar con guiso de coco y tomate.', 'Armar y freír.'], ing: ['Masa', 'Pescado blanco', 'Leche de coco'], secret: 'Acompañar con salsa de tamarindo.', tags: ['mar'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Pabellón', time: '50m', diff: 'Media', prep: ['Hacer relleno con carne desmechada, caraotas negras (frijol) y plátano maduro frito.', 'Armar y freír.'], ing: ['Masa', 'Carne', 'Caraotas', 'Maduro'], secret: 'Los frijoles deben estar sin caldo.', tags: ['fusión'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Mexicana', time: '45m', diff: 'Media', prep: ['Preparar carne molida con chile y especias.', 'Mezclar con maíz dulce y frijol rojo escurrido.', 'Armar y freír.'], ing: ['Masa', 'Carne molida', 'Maíz dulce', 'Chile'], secret: 'Servir con pico de gallo encima.', tags: ['picante'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Ranchera', time: '45m', diff: 'Media', prep: ['Picar salchicha ranchera y sofreír.', 'Mezclar con maíz dulce y queso doble crema.', 'Armar y freír.'], ing: ['Masa', 'Salchicha ranchera', 'Maíz', 'Queso'], secret: 'La favorita de los niños.', tags: ['kids'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada Mixta', time: '45m', diff: 'Media', prep: ['Mezclar sobras de carne desmechada y pollo con un buen hogao.', 'Armar y freír.'], ing: ['Masa', 'Carne', 'Pollo', 'Hogao'], secret: 'Ideal para aprovechar sobras del almuerzo.', tags: ['reciclaje'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Arroz', time: '40m', diff: 'Media', prep: ['Hacer relleno solo de arroz cocido con huevo duro picado y especias.', 'Armar y freír.'], ing: ['Masa', 'Arroz', 'Huevo duro', 'Comino'], secret: 'Usar bastante comino en el arroz.', tags: ['economica'] },
+            { module: 'fritos', category: 'empanadas', name: 'Empanada de Pipián', time: '50m', diff: 'Difícil', prep: ['Hacer guiso de papa colorada y maní tostado molido.', 'Rellenar masa muy fina de maíz añejo.', 'Freír y servir con ají de maní.'], ing: ['Masa añeja', 'Papa colorada', 'Maní tostado'], secret: 'El maní es el ingrediente indispensable.', tags: ['tradicional'] },
+            
+            // Pasteles
+            { module: 'fritos', category: 'pasteles', name: 'Pastel Pollo Tradicional', time: '50m', diff: 'Media', prep: ['Hacer una masa de maíz añejo (más fina y crocante).', 'Extender círculos más grandes que una empanada.', 'Poner una "cama" de arroz cocido, luego el pollo guisado, arvejas y zanahoria.', 'Cerrar haciendo un repulgue manual o con tenedor.', 'Freír en aceite medio hasta que la masa esté muy crocante.'], ing: ['Masa maíz añejo', 'Pollo guisado', 'Arroz cocido', 'Arvejas/Zanahoria'], secret: 'El guiso del pollo debe ser húmedo para que el pastel no quede seco por dentro.', tags: ['almuerzo'] },
+            { module: 'fritos', category: 'pasteles', name: 'Pastel Carne Aceitunas', time: '50m', diff: 'Media', prep: ['Preparar relleno de carne molida guisada.', 'Añadir al relleno huevo duro picado, aceitunas laminadas y alcaparras.', 'Armar el pastel grande y freír.'], ing: ['Masa maíz', 'Carne molida', 'Aceitunas', 'Alcaparras', 'Huevo duro'], secret: 'El sabor de la aceituna y alcaparra da el toque cartagenero auténtico.', tags: ['costeño'] },
+            { module: 'fritos', category: 'pasteles', name: 'Pastel Pollo Pasas', time: '50m', diff: 'Media', prep: ['Hacer un guiso de pollo con un toque dulce (panela o azúcar).', 'Añadir uvas pasas al relleno al momento de armar.', 'Cerrar y freír.'], ing: ['Masa maíz', 'Pollo guisado', 'Uvas pasas'], secret: 'El contraste agridulce es típico de la costa Caribe.', tags: ['costeño'] },
+            { module: 'fritos', category: 'pasteles', name: 'Pastel Carne Papa', time: '50m', diff: 'Media', prep: ['Picar papa en cubos muy pequeños y cocinar.', 'Mezclar con carne molida guisada (proporción 50/50).', 'Armar pasteles y freír.'], ing: ['Masa maíz', 'Carne molida', 'Papa común'], secret: 'La papa absorbe el jugo de la carne y rinde mucho el relleno.', tags: ['clásico'] },
+            { module: 'fritos', category: 'pasteles', name: 'Pastel Huevo', time: '50m', diff: 'Media', prep: ['Sobre el relleno base (carne o pollo y arroz), colocar medio huevo duro o uno entero si es pequeño.', 'Cubrir con masa con cuidado de no romperla al estirar sobre el huevo.', 'Freír.'], ing: ['Masa maíz', 'Relleno carne/arroz', 'Huevo duro'], secret: 'Ubicar el huevo justo en el centro para que sea la sorpresa al morder.', tags: ['sorpresa'] },
+            
+            // Arepas
+            { module: 'fritos', category: 'arepas', name: 'Arepa de Huevo Tradicional', time: '40m', diff: 'Difícil', prep: ['Amasar maíz peto (trillado) o harina precocida con agua y sal. Hacer arepas de unos 5mm de grosor.', 'Freír en abundante aceite a temperatura media hasta que se inflen y suban a la superficie (aprox 3 min). No dejar dorar mucho.', 'Sacar, escurrir rápido y con cuidado hacer una ranura lateral (boca) con un cuchillo fino.', 'Verter un huevo crudo dentro de la arepa (ayúdate vaciando el huevo en una taza pequeña primero).', 'Sellar la ranura con un poco de masa cruda reservada.', 'Volver a freír hasta que el huevo se cocine y la arepa dore.'], ing: ['Masa maíz peto', 'Huevos crudos', 'Aceite abundante', 'Sal'], secret: 'Al verter el huevo, mantén la arepa vertical y espera unos segundos que el huevo baje al fondo antes de intentar sellar.', tags: ['icono'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa Carne Desmechada', time: '45m', diff: 'Difícil', prep: ['Seguir el proceso de la arepa de huevo.', 'Antes de verter el huevo, introducir carne desmechada (previamente cocinada y SECA) por la ranura, empujándola al fondo.', 'Luego verter el huevo, sellar y freír.'], ing: ['Masa maíz', 'Huevo', 'Carne desmechada'], secret: 'La carne debe estar seca (sin salsa) o ablandará la masa y se romperá en el aceite.', tags: ['completa'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa Jamón y Queso', time: '40m', diff: 'Difícil', prep: ['Igual proceso de fritura inicial.', 'Introducir jamón picado y queso costeño rallado o en cubos antes del huevo.', 'Sellar y terminar fritura.'], ing: ['Masa maíz', 'Huevo', 'Jamón', 'Queso'], secret: 'Usa un queso que no suelte mucha agua (costeño o doble crema seco).', tags: ['mixta'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa Salchicha', time: '40m', diff: 'Difícil', prep: ['Picar salchicha finamente.', 'En un vaso, poner el huevo crudo y la salchicha.', 'Batir ligeramente para mezclar y verter todo junto dentro de la arepa.', 'Sellar y freír.'], ing: ['Masa maíz', 'Huevo', 'Salchicha ranchera/viena'], secret: 'Batir ligeramente el huevo con la salchicha facilita el vertido y distribución.', tags: ['rápido'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa Hogao', time: '40m', diff: 'Difícil', prep: ['Tener listo un hogao bien espeso y frío.', 'Introducir una cucharada generosa de hogao dentro de la arepa antes del huevo.', 'Sellar y freír.'], ing: ['Masa maíz', 'Huevo', 'Hogao espeso'], secret: 'El hogao debe ser una pasta, si tiene líquido dañará la arepa.', tags: ['criollo'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa de Huevo Pollo', time: '45m', diff: 'Difícil', prep: ['Usar pollo desmechado seco.', 'Introducir el pollo en la arepa antes del huevo.', 'Verter huevo, sellar y freír.'], ing: ['Masa maíz', 'Huevo', 'Pollo desmechado'], secret: 'Pollo bien sazonado con comino.', tags: ['completa'] },
+            { module: 'fritos', category: 'arepas', name: 'Arepa de Huevo Queso', time: '40m', diff: 'Difícil', prep: ['Introducir cubos de queso costeño en la arepa.', 'Añadir el huevo crudo, sellar y freír.'], ing: ['Masa maíz', 'Huevo', 'Queso costeño'], secret: 'Doble queso para mayor placer.', tags: ['queso'] },
+
+            // Carimañolas y Papas
+            { module: 'fritos', category: 'carimanolas', name: 'Carimañola Carne', time: '50m', diff: 'Media', prep: ['Cocinar yuca en agua con sal hasta que ablande bien.', 'Escurrir y retirar la vena central.', 'Moler la yuca INMEDIATAMENTE mientras está caliente (paso crítico).', 'Amasar el puré con un poco de aceite hasta obtener una masa suave.', 'Engrasar las manos, tomar una porción, hacer un disco, rellenar con carne molida guisada (seca).', 'Cerrar dando forma de zepelín (ovalada con puntas).', 'Freír en aceite muy caliente.'], ing: ['Yuca harinosa', 'Carne molida guisada', 'Aceite'], secret: 'Si la yuca se enfría antes de moler, la masa queda grumosa y dura. Debe ser en caliente.', tags: ['yuca', 'costeño'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Carimañola Queso', time: '40m', diff: 'Media', prep: ['Hacer la masa de yuca igual que la de carne.', 'Rellenar con bastones gruesos de queso costeño.', 'Cerrar y freír hasta dorar.'], ing: ['Masa de yuca', 'Queso costeño'], secret: 'El queso costeño es ideal porque es salado y resiste el calor sin fundirse totalmente y salirse.', tags: ['queso'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Carimañola Pollo', time: '45m', diff: 'Media', prep: ['Rellenar la masa de yuca con pollo guisado desmechado.', 'Cerrar en forma de zepelín y freír.'], ing: ['Masa yuca', 'Pollo guisado'], secret: 'El pollo debe estar desmechado muy fino.', tags: ['yuca'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Papa Rellena Clásica', time: '60m', diff: 'Media', prep: ['Cocinar papas pastusas peladas con sal hasta que estén blandas.', 'Triturar para hacer puré (NO añadir leche ni mantequilla, solo sal). Dejar enfriar.', 'Tomar una porción de puré en la mano, hacer un hueco, rellenar con carne guisada y huevo duro.', 'Cerrar formando una bola perfecta.', 'Preparar una tempura (mezcla para rebozar) con harina, huevo, agua, sal y color.', 'Pasar la bola por la tempura y freír en aceite caliente hasta dorar.'], ing: ['Papas pastusas', 'Guiso carne', 'Huevo duro', 'Tempura (harina/huevo/agua)'], secret: 'El rebozado es vital para crear la capa crocante externa y evitar que la papa se desbarate en el aceite.', tags: ['papa', 'callejero'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Papa Rellena Queso', time: '50m', diff: 'Media', prep: ['Hacer el puré base de papa.', 'Preparar relleno de queso mezclado con espinaca salteada (sin líquido).', 'Rellenar, cerrar, pasar por rebozado y freír.'], ing: ['Papa', 'Queso', 'Espinaca', 'Rebozado'], secret: 'Apretar bien la bola de puré para sacar el aire antes de rebozar.', tags: ['vege'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Papa Rellena Atún', time: '50m', diff: 'Media', prep: ['Hacer un guiso seco de atún con tomate y cebolla.', 'Rellenar la papa, pasar por tempura y freír.'], ing: ['Papa', 'Atún lata', 'Guiso', 'Rebozado'], secret: 'Una opción económica y deliciosa para variar.', tags: ['pescado'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Papa Rellena Pollo', time: '55m', diff: 'Media', prep: ['Rellenar la papa con guiso de pollo desmechado.', 'Rebozar y freír.'], ing: ['Papa', 'Pollo guisado', 'Rebozado'], secret: 'El pollo debe estar jugoso pero no líquido.', tags: ['pollo'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Aborrajado', time: '30m', diff: 'Media', prep: ['Cortar plátano maduro (cáscara negra) en trozos y freír hasta dorar.', 'Aplanar cada trozo (como un patacón).', 'Poner una lámina de queso y un poco de bocadillo en el centro.', 'Doblar y cerrar formando una bola o cilindro, asegurando que el relleno quede dentro.', 'Pasar por una mezcla de rebozado (harina, huevo, leche, azúcar) y freír nuevamente.'], ing: ['Plátano maduro', 'Queso', 'Bocadillo', 'Mezcla rebozado dulce'], secret: 'El plátano debe estar bien maduro para que sea dulce y suave.', tags: ['dulce-salado'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Marranitas', time: '40m', diff: 'Media', prep: ['Freír plátano verde en trozos grandes. Aplastar para hacer una lámina.', 'Poner chicharrón picado carnudo en el centro.', 'Cerrar formando una bola cubriendo el chicharrón.', 'Freír nuevamente hasta dorar.'], ing: ['Plátano verde', 'Chicharrón frito picado', 'Ajo'], secret: 'El chicharrón debe estar bien crocante antes de rellenar.', tags: ['cali'] },
+            { module: 'fritos', category: 'carimanolas', name: 'Chuleta Valluna', time: '30m', diff: 'Media', prep: ['Aplanar lomo de cerdo hasta que quede muy fino.', 'Pasar por harina de trigo, luego huevo batido y finalmente miga de pan.', 'Freír en aceite caliente.'], ing: ['Lomo cerdo', 'Miga pan', 'Huevo', 'Harina'], secret: 'Marinar la carne en agua de ajo antes de apanar.', tags: ['frito'] },
+
+            // Buñuelos y Palitos
+            { module: 'fritos', category: 'bunuelos', name: 'Buñuelo Tradicional', time: '30m', diff: 'Media', prep: ['Moler el queso costeño muy fino (polvo).', 'En un tazón, mezclar el queso con la fécula de maíz, el almidón de yuca, el azúcar y la sal.', 'Añadir los huevos y amasar con la mano hasta obtener una textura suave y homogénea.', 'Formar bolas perfectas sin grietas.', 'Calentar el aceite a temperatura media (150°C). Si está muy caliente se queman por fuera y quedan crudos; si muy frío se enchumban.', 'Freír hasta que doren y floten girando solos.'], ing: ['1 taza Queso costeño molido', '1 taza fécula maíz', '1/4 taza almidón yuca', '2 huevos', '1 cdta azúcar'], secret: 'Prueba del aceite: echa una bolita de masa, debe demorar unos 5-8 segundos en subir a la superficie y flotar.', tags: ['navidad', 'maíz'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Buñuelo Relleno', time: '35m', diff: 'Media', prep: ['Hacer la masa de buñuelo tradicional.', 'Al armar la bola, introducir un cubo de bocadillo o arequipe en el centro.', 'Cerrar muy bien asegurando que no quede expuesto.', 'Freír con cuidado.'], ing: ['Masa buñuelo', 'Bocadillo o Arequipe'], secret: 'El relleno debe estar frío o congelado para que no se derrita demasiado rápido y se salga.', tags: ['postre'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Palito de Queso', time: '30m', diff: 'Fácil', prep: ['Hacer una masa de harina de trigo elástica (tipo dedito o tequeño).', 'Cortar el queso costeño en bastones largos.', 'Estirar la masa y cortar en tiras largas.', 'Enrollar la tira de masa alrededor del queso en espiral, cubriéndolo totalmente.', 'Asegurar bien las puntas.', 'Freír en aceite caliente.'], ing: ['Harina trigo', 'Mantequilla', 'Agua', 'Queso costeño bloque'], secret: 'Pellizcar las puntas y traslapar bien la masa para que no escape el queso al fundirse.', tags: ['dedito'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Palito Jamón', time: '30m', diff: 'Fácil', prep: ['Enrollar el bastón de queso en una loncha de jamón.', 'Luego proceder a enrollar la masa sobre el jamón y queso.', 'Freír.'], ing: ['Masa trigo', 'Queso', 'Jamón'], secret: 'Doble sabor y protección para el queso.', tags: ['mix'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Palito Coco', time: '30m', diff: 'Fácil', prep: ['Hacer la masa con un poco más de azúcar.', 'Armar el palito de queso.', 'Pasar por huevo batido y luego revolcar en coco rallado.', 'Freír con cuidado.'], ing: ['Masa dulce', 'Queso', 'Coco rallado'], secret: 'El aceite no debe estar muy caliente porque el coco se quema rápido.', tags: ['dulce'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Palito Bocadillo', time: '30m', diff: 'Fácil', prep: ['Enrollar un trozo de queso y uno de bocadillo juntos con la masa.', 'Freír.'], ing: ['Masa', 'Queso', 'Bocadillo'], secret: 'Combinación clásica de dulce y salado.', tags: ['dulce'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Palito Hawaiano', time: '30m', diff: 'Fácil', prep: ['Enrollar jamón, queso y un trozo de piña calada con la masa.', 'Freír.'], ing: ['Masa', 'Jamón', 'Piña', 'Queso'], secret: 'La piña debe estar bien seca.', tags: ['agridulce'] },
+            { module: 'fritos', category: 'bunuelos', name: 'Tequeños', time: '30m', diff: 'Media', prep: ['Preparar una masa de harina de trigo elástica con mantequilla.', 'Usar queso duro llanero o costeño bajo en sal cortado en bastones.', 'Enrollar la masa cubriendo el queso completamente.', 'Freír.'], ing: ['Harina trigo', 'Mantequilla', 'Huevo', 'Queso duro'], secret: 'El queso debe ser duro y salado para aguantar la temperatura.', tags: ['fiesta'] },
+
+            // Otros
+            { module: 'fritos', category: 'otros', name: 'Arepuelas', time: '20m', diff: 'Fácil', prep: ['Mezclar harina de trigo, huevo, azúcar, pizca de sal, semillas de anís y un poco de agua o leche.', 'Amasar hasta obtener una masa suave.', 'Estirar discos delgados con rodillo.', 'Freír en aceite caliente hasta que doren y se abomben.'], ing: ['Harina trigo', 'Huevo', 'Azúcar', 'Semillas anís'], secret: 'Deben quedar crujientes en los bordes y suaves en el centro.', tags: ['café'] },
+            { module: 'fritos', category: 'otros', name: 'Patacones (Tostones)', time: '25m', diff: 'Fácil', prep: ['Pelar plátanos verdes y cortar en trozos de 3-4 cm.', 'Freír en aceite medio hasta que estén cocidos por dentro pero pálidos.', 'Sacar y aplastar con pataconera (pisar).', 'Pasar rápidamente por agua de ajo con sal.', 'Freír por segunda vez en aceite bien caliente hasta dorar.'], ing: ['Plátanos verdes machos', 'Aceite', 'Ajo machacado', 'Sal'], secret: 'El paso por agua de ajo antes de la segunda fritura es lo que les da el sabor característico y la crocancia.', tags: ['acompañamiento'] },
+            { module: 'fritos', category: 'otros', name: 'Papas Chorreadas', time: '40m', diff: 'Fácil', prep: ['Cocinar papas rojas enteras con piel en agua con sal.', 'Aparte, hacer un guiso (hogao) abundante con tomate y cebolla.', 'Añadir crema de leche y queso rallado al guiso, cocinar hasta espesar.', 'Servir las papas calientes bañadas con la salsa.'], ing: ['Papas rojas', 'Tomate/Cebolla', 'Crema de leche', 'Queso'], secret: 'Aunque no son fritas, son el acompañamiento clásico de la fritanga. La salsa debe ser abundante.', tags: ['almuerzo'] },
+            { module: 'fritos', category: 'otros', name: 'Maduros Rellenos', time: '30m', diff: 'Media', prep: ['Freír el plátano maduro entero pelado (o hornear).', 'Abrir una ranura a lo largo sin separar.', 'Rellenar con queso mozzarella y bocadillo.', 'Llevar al horno o sartén tapada para gratinar.'], ing: ['Plátano muy maduro', 'Queso mozzarella', 'Bocadillo'], secret: 'El plátano debe tener la cáscara negra para que sea dulce y suave.', tags: ['dulce'] },
+            { module: 'fritos', category: 'otros', name: 'Kibbeh', time: '40m', diff: 'Media', prep: ['Hidratar trigo americano.', 'Mezclar con carne molida cruda y especias árabes.', 'Formar zepelines y rellenar con guiso de carne y piñones.', 'Freír hasta oscurecer.'], ing: ['Trigo americano', 'Carne molida', 'Yerbabuena'], secret: 'La carne de la masa debe ser muy magra (sin grasa).', tags: ['arabe'] },
+
+            // Salsas (Cap 9)
+            { module: 'fritos', category: 'salsas', name: 'Hogao Valluno', time: '20m', diff: 'Fácil', prep: ['Picar cebolla larga (junca) y tomate maduro muy finamente.', 'Calentar aceite con achiote (color) en una sartén.', 'Sofreír primero la cebolla hasta que transparente.', 'Agregar el tomate, sal y comino.', 'Cocinar a fuego muy bajo por 20 minutos revolviendo ocasionalmente hasta obtener una pasta suave.'], ing: ['Cebolla larga', 'Tomates maduros', 'Achiote', 'Comino'], secret: 'El tiempo lento es clave. Si se seca, añade una cucharadita de leche o agua.', tags: ['salsa', 'base'] },
+            { module: 'fritos', category: 'salsas', name: 'Ají Picante', time: '10m', diff: 'Fácil', prep: ['Picar finamente ajíes, cebolla larga y cilantro.', 'Poner en un frasco de vidrio.', 'Cubrir con partes iguales de agua y vinagre blanco.', 'Añadir sal y un chorrito de limón.', 'Dejar reposar al menos 2 horas antes de usar.'], ing: ['Ají picante', 'Cebolla larga', 'Cilantro', 'Vinagre blanco'], secret: 'Para bajar el picante, retira las venas y semillas del ají antes de picar.', tags: ['picante'] },
+            { module: 'fritos', category: 'salsas', name: 'Guacamole', time: '10m', diff: 'Fácil', prep: ['Triturar la pulpa de aguacate maduro con un tenedor (dejar algunos trozos).', 'Mezclar con cebolla picada, tomate picado (sin semillas) y cilantro.', 'Añadir jugo de limón y sal inmediatamente.'], ing: ['Aguacates hass', 'Tomate', 'Cebolla', 'Cilantro', 'Limón'], secret: 'El limón evita la oxidación. Dejar la pepa (hueso) dentro de la salsa ayuda a conservar el color.', tags: ['crema'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Tamarindo', time: '20m', diff: 'Media', prep: ['Sacar la pulpa de tamarindo (o usar concentrado).', 'Poner en una olla con azúcar, un poco de vinagre y una pizca de sal.', 'Cocinar hasta reducir y obtener textura de salsa BBQ.', 'Colar si se desea muy fina.'], ing: ['Pulpa tamarindo', 'Azúcar', 'Vinagre', 'Ketchup (opcional)'], secret: 'El equilibrio agridulce es perfecto para fritos de mar o empanadas de carne.', tags: ['fruta', 'agridulce'] },
+            { module: 'fritos', category: 'salsas', name: 'Ajo y Limón', time: '5m', diff: 'Fácil', prep: ['En un bowl, poner mayonesa base.', 'Añadir pasta de ajo (o ajo machacado muy fino).', 'Incorporar jugo de limón y perejil picado.', 'Mezclar bien.'], ing: ['Mayonesa', 'Ajo', 'Limón', 'Perejil'], secret: 'Usar ajo asado en vez de crudo para un sabor más suave y sofisticado.', tags: ['blanca'] },
+            { module: 'fritos', category: 'salsas', name: 'Cilantro Yogur', time: '5m', diff: 'Fácil', prep: ['Poner en licuadora: yogur griego natural, un manojo grande de cilantro, jugo de limón, sal y un diente de ajo pequeño.', 'Licuar hasta que esté verde y homogéneo.'], ing: ['Yogur griego sin dulce', 'Cilantro', 'Limón', 'Ajo'], secret: 'Una salsa ligera ideal para balancear la grasa de los fritos.', tags: ['verde', 'light'] },
+            { module: 'fritos', category: 'salsas', name: 'Miel Mostaza', time: '5m', diff: 'Fácil', prep: ['Mezclar en un bowl partes iguales de miel de abejas y mostaza.', 'Añadir unas gotas de limón para equilibrar.'], ing: ['Miel', 'Mostaza', 'Limón'], secret: 'Usar mostaza antigua (con granos) para mejor textura.', tags: ['pollo'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Guayaba', time: '20m', diff: 'Media', prep: ['Picar bocadillo veleño en cubos.', 'Poner en olla con un poco de agua caliente.', 'Cocinar removiendo hasta que se funda y sea una salsa.', 'Añadir unas gotas de limón o vinagre.'], ing: ['Bocadillo (pasta guayaba)', 'Agua', 'Limón'], secret: 'Añadir un poco de chipotle o ají para una versión picante deliciosa.', tags: ['dulce'] },
+            { module: 'fritos', category: 'salsas', name: 'Tomate y Ajo', time: '15m', diff: 'Fácil', prep: ['Rallar tomates maduros (sin piel).', 'Mezclar el puré fresco con ajo machacado, aceite de oliva, sal y orégano.', 'No cocinar.'], ing: ['Tomate rojo', 'Ajo', 'Aceite oliva', 'Orégano'], secret: 'Salsa fresca tipo "tumaca" ideal para empanadas de queso.', tags: ['roja'] },
+            { module: 'fritos', category: 'salsas', name: 'Cebolla Vinagre', time: '30m', diff: 'Fácil', prep: ['Cortar cebolla roja en plumas muy finas.', 'Pasar por agua hirviendo 1 minuto y escurrir (blanquear).', 'Poner en un frasco con vinagre, sal, limón y pimienta.'], ing: ['Cebolla roja', 'Vinagre blanco', 'Limón'], secret: 'Es el acompañante obligatorio de la butifarra.', tags: ['ácido'] },
+            { module: 'fritos', category: 'salsas', name: 'Suero Costeño', time: '10m', diff: 'Media', prep: ['Versión rápida: Mezclar crema de leche espesa (o crema agria) con jugo de limón y sal al gusto. Dejar reposar 10 min.', 'Versión tradicional: Dejar fermentar leche cruda en ambiente cálido, separar el suero y batir con sal.'], ing: ['Crema de leche/Agria', 'Limón', 'Sal'], secret: 'El punto de sal debe ser un poco alto.', tags: ['costeño'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Piña', time: '15m', diff: 'Fácil', prep: ['Picar piña oro miel en cubitos diminutos.', 'Poner en sartén con azúcar y dejar calar (cocinar) en su propio jugo hasta que esté brillante.', 'Dejar enfriar.'], ing: ['Piña', 'Azúcar'], secret: 'No licuar, los trocitos son la clave.', tags: ['dulce'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Tocineta', time: '15m', diff: 'Fácil', prep: ['Picar tocineta muy fina y freír hasta que esté crocante.', 'Mezclar la tocineta (y un poco de su grasa) con mayonesa o crema de leche y queso crema.', 'Añadir pimienta.'], ing: ['Tocineta', 'Mayonesa/Queso crema'], secret: 'Usar la grasa de la tocineta da todo el sabor.', tags: ['sabor'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Showi', time: '5m', diff: 'Fácil', prep: ['Mezclar mayonesa, salsa de tomate (ketchup), mostaza, un poco de salsa negra (inglesa) y ajo en polvo.', 'Integrar bien.'], ing: ['Mayonesa', 'Ketchup', 'Mostaza', 'Salsa negra', 'Ajo'], secret: 'Es la versión mejorada de la salsa rosada, llena de umami.', tags: ['rápido'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Tártara', time: '10m', diff: 'Fácil', prep: ['Partir de una base de mayonesa.', 'Picar muy finamente: alcaparras, cebolla, perejil y huevo duro.', 'Mezclar todo con la mayonesa y un chorrito de limón.'], ing: ['Mayonesa', 'Alcaparras', 'Cebolla', 'Huevo duro', 'Perejil'], secret: 'Dejar reposar en nevera para que los sabores se integren.', tags: ['pescado'] },
+            { module: 'fritos', category: 'salsas', name: 'Guasacaca', time: '10m', diff: 'Fácil', prep: ['Licuar aguacate, pimentón verde, cebolla, ajo, cilantro, vinagre y aceite.', 'Debe quedar una salsa verde lisa y fluida.'], ing: ['Aguacate', 'Pimentón verde', 'Vinagre', 'Cilantro'], secret: 'A diferencia del guacamole, esta es una salsa líquida y vinagrosa.', tags: ['verde'] },
+            { module: 'fritos', category: 'salsas', name: 'Cilantro Limón', time: '5m', diff: 'Fácil', prep: ['Picar mucho cilantro y cebolla larga muy fino.', 'Mezclar con aceite vegetal, vinagre, limón y sal.'], ing: ['Cilantro', 'Cebolla larga', 'Aceite', 'Limón'], secret: 'Una especie de chimichurri criollo fresco.', tags: ['ensalada'] },
+            { module: 'fritos', category: 'salsas', name: 'Aguacate Tomatillo', time: '10m', diff: 'Media', prep: ['Asar tomatillos verdes y chiles en sartén.', 'Licuar con pulpa de aguacate, ajo y cilantro.', 'Sazonar.'], ing: ['Tomatillos', 'Aguacate', 'Chile'], secret: 'Salsa verde picante estilo mexicano.', tags: ['picante'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Mango', time: '10m', diff: 'Fácil', prep: ['Picar mango biche (verde) o pintón en tiritas o cubos finos.', 'Mezclar con jugo de limón, sal y pimienta.'], ing: ['Mango biche', 'Limón', 'Pimienta'], secret: 'Textura crocante y sabor ácido.', tags: ['fruta'] },
+            { module: 'fritos', category: 'salsas', name: 'Salsa Coco', time: '15m', diff: 'Media', prep: ['Poner leche de coco en una olla con un trozo de panela y un ají entero.', 'Reducir hasta que espese un poco.', 'Retirar ají.'], ing: ['Leche coco', 'Panela', 'Ají dulce/picante'], secret: 'Ideal para acompañar fritos de pescado.', tags: ['costeño'] },
+
+            // ==========================================
+            // ASADOS (Doctor Burger - Completos)
+            // ==========================================
+            { module: 'bbq', category: 'cerdo', name: 'Costillar St. Louis', time: '4h', diff: 'Media', prep: ['Retirar la membrana trasera del hueso (es dura e impide el paso del sabor).', 'Aplicar una capa fina de mostaza como pegamento.', 'Espolvorear el Rub (mezcla de especias) generosamente por ambos lados.', 'Llevar al barril o ahumador a 120°C (250°F) por 3-4 horas.', 'Rociar con jugo de manzana cada hora para mantener humedad.', 'Envolver en aluminio la última hora si se quiere muy suave.'], ing: ['Costillar de cerdo corte St. Louis', 'Rub BBQ', 'Mostaza', 'Jugo de manzana'], secret: 'La prueba de fuego: cuando la carne se retraiga del hueso aprox 1cm, están listas.', tags: ['lento'] },
+            { module: 'bbq', category: 'cerdo', name: 'Costillas Miel Mostaza', time: '3h', diff: 'Media', prep: ['Seguir el proceso de ahumado normal del costillar.', 'Mezclar miel y mostaza en un bowl.', 'En los últimos 30 minutos de cocción, pincelar las costillas con la mezcla.', 'Dejar caramelizar sin que se queme.'], ing: ['Costillas', 'Miel', 'Mostaza Dijon'], secret: 'Si el fuego es muy alto, la miel se quema rápido y amarga. Pincelar solo al final.', tags: ['glaseado'] },
+            { module: 'bbq', category: 'cerdo', name: 'Costillas Coreanas (Galbi)', time: '2h', diff: 'Media', prep: ['Usar costilla de res o cerdo cortada transversalmente (flanken/asado de tira).', 'Marinar 2 horas en salsa de soja, aceite de sésamo, pera asiática rallada, ajo, jengibre y azúcar.', 'Asar a fuego directo muy caliente y rápido.'], ing: ['Costillas corte flanken', 'Salsa soja', 'Aceite sésamo', 'Pera asiática'], secret: 'La pera asiática tiene enzimas que ablandan la carne increíblemente.', tags: ['internacional'] },
+            { module: 'bbq', category: 'cerdo', name: 'Costillas Ciruela', time: '2.5h', diff: 'Media', prep: ['Ahumar las costillas con sal y pimienta.', 'Hacer una salsa reduciendo mermelada de ciruela, vinagre y un toque de soya.', 'Pincelar las costillas con la salsa durante la última hora de cocción.'], ing: ['Costillas', 'Mermelada de ciruela', 'Vinagre', 'Soya'], secret: 'Aporta un color oscuro brillante y sabor agridulce sofisticado.', tags: ['agridulce'] },
+            { module: 'bbq', category: 'cerdo', name: 'Chicharrón Crujiente', time: '2h', diff: 'Media', prep: ['Hacer cortes transversales en la carne del tocino sin llegar a cortar la piel.', 'Aplicar sal y bicarbonato de sodio SOLO en la piel. Dejar secar en nevera destapado (piel arriba) desde la noche anterior.', 'Asar en barril a fuego medio-alto (180°C) hasta que la piel estalle y burbujee.'], ing: ['Tocino barriguero carnudo', 'Sal', 'Bicarbonato de sodio'], secret: 'La piel debe estar completamente seca para que quede crocante (efecto galleta). La humedad es enemiga de la crocancia.', tags: ['crocante'] },
+            { module: 'bbq', category: 'cerdo', name: 'Chicharrón Limón', time: '2h', diff: 'Media', prep: ['Marinar la carne del tocino con abundante jugo de limón y sal (evitar mojar la piel si se quiere crocante).', 'Asar colgado en el barril.', 'Al servir, rallar cáscara de limón fresca encima.'], ing: ['Tocino', 'Limones', 'Sal'], secret: 'El ácido del limón ayuda a cortar la sensación de grasa al comer.', tags: ['ácido'] },
+            { module: 'bbq', category: 'cerdo', name: 'Bondiola Ahumada', time: '6h', diff: 'Media', prep: ['Usar cabeza de lomo (bondiola).', 'Aplicar rub de cerdo abundante.', 'Ahumar a 120°C hasta alcanzar temperatura interna de 90°C (para desmechar).', 'Dejar reposar y deshebrar con tenedores.'], ing: ['Bondiola de cerdo', 'Rub dulce/picante'], secret: 'Ideal para sándwiches de Pulled Pork. Mezclar con salsa BBQ al final.', tags: ['pulled pork'] },
+            { module: 'bbq', category: 'cerdo', name: 'Lomo al Trapo', time: '40m', diff: 'Difícil', prep: ['Empapar un trapo de algodón limpio en vino tinto.', 'Extender el trapo, poner una cama gruesa de sal (1cm).', 'Poner el lomo de cerdo (o res) encima, cubrir con más sal y enrollar el trapo apretado. Amarrar con piola.', 'Poner directamente sobre las brasas (fuego vivo) 15-20 min por lado.', 'Retirar, romper la costra de sal y limpiar.'], ing: ['Lomo de cerdo', 'Trapo algodón', 'Vino tinto', 'Sal (1kg)'], secret: 'El trapo húmedo no se quema, y la sal crea un horno hermético que cocina la carne en su jugo.', tags: ['espectáculo'] },
+            { module: 'bbq', category: 'res', name: 'Brisket Texas', time: '12h', diff: 'Difícil', prep: ['Limpiar el exceso de grasa exterior dejando una capa de 6mm.', 'Sazonar solo con Sal Kosher y Pimienta Negra (partes iguales - Dalmatian Rub).', 'Ahumar a baja temperatura (107°C) hasta que la temperatura interna llegue a 74°C (aprox 6-7 horas).', 'Envolver en papel carnicero (Texas Crutch) y volver al calor hasta llegar a 93°C internos o que se sienta como mantequilla al pinchar.', 'Reposar en una hielera seca por 2 horas antes de cortar.'], ing: ['Pecho de res entero', 'Sal Kosher', 'Pimienta negra 16 mesh'], secret: 'El reposo es crucial. Si cortas antes, todos los jugos se perderán y quedará seco.', tags: ['lento', 'experto'] },
+            { module: 'bbq', category: 'res', name: 'Picanha (Punta de Anca)', time: '45m', diff: 'Media', prep: ['Hacer cortes en rombos en la grasa superficial.', 'Sellar primero por el lado de la grasa para derretirla.', 'Asar a fuego indirecto hasta temperatura interna de 63°C (Término Medio).', 'Dejar reposar 10 min antes de cortar.'], ing: ['Punta de Anca', 'Sal gruesa'], secret: 'Cortar siempre en contra de la fibra para máxima suavidad.', tags: ['rápido'] },
+            { module: 'bbq', category: 'res', name: 'Tomahawk', time: '40m', diff: 'Fácil', prep: ['Salpimentar la pieza.', 'Usar método de sellado inverso: Asar primero a fuego indirecto hasta que falten 5°C para el término deseado.', 'Pasar a fuego directo muy fuerte para dorar la costra (1 min por lado).', 'Terminar con un trozo de mantequilla encima mientras reposa.'], ing: ['Tomahawk Steak', 'Mantequilla', 'Sal/Pimienta'], secret: 'Envolver el hueso expuesto en aluminio para que no se ponga negro estéticamente.', tags: ['premium'] },
+            { module: 'bbq', category: 'res', name: 'Entraña', time: '10m', diff: 'Fácil', prep: ['Retirar los cueros (membranas) de ambos lados si no los han quitado.', 'Fuego muy alto (arrebatado).', 'Asar 3-4 minutos por lado.', 'Sal preferiblemente al final.'], ing: ['Entraña fina', 'Sal marina'], secret: 'Es un corte para comer jugoso. Si se pasa de término se pone duro.', tags: ['rápido'] },
+            { module: 'bbq', category: 'res', name: 'Asado de Tira', time: '30m', diff: 'Media', prep: ['Costilla de res corte ventana (transversal).', 'Fuego medio.', 'Empezar asando del lado del hueso.', 'Dar vuelta y dorar.', 'Salmuera durante la cocción.'], ing: ['Costilla de res', 'Sal'], secret: 'La grasa debe quedar dorada y crocante, no blanca.', tags: ['clásico'] },
+            { module: 'bbq', category: 'pollo', name: 'Pollo Entero Barril', time: '1.5h', diff: 'Fácil', prep: ['Marinar el pollo entero desde la noche anterior con jugo de naranja, cerveza, ajo, cebolla y romero.', 'Colocar en el gancho del barril verticalmente.', 'Cocinar a 180°C durante 1 hora y media.', 'Verificar que la temperatura interna en la pechuga sea de 74°C.'], ing: ['Pollo entero', 'Naranja agria', 'Cerveza', 'Ajo/Hierbas'], secret: 'Introducir mantequilla con hierbas bajo la piel de la pechuga para que quede extra jugosa.', tags: ['familiar'] },
+            { module: 'bbq', category: 'pollo', name: 'Alitas BBQ', time: '45m', diff: 'Fácil', prep: ['Secar bien las alitas.', 'Aplicar Rub de pollo.', 'Asar a fuego indirecto para cocinar sin quemar.', 'Cuando estén casi listas y la piel crocante, bañar en salsa BBQ y dejar caramelizar 5 min.'], ing: ['Alitas de pollo', 'Rub pollo', 'Salsa BBQ'], secret: 'Nunca poner la salsa al principio o el azúcar se quemará y la piel quedará blanda.', tags: ['snack'] },
+            { module: 'bbq', category: 'pollo', name: 'Muslos Rellenos', time: '1h', diff: 'Media', prep: ['Deshuesar los muslos manteniendo la piel.', 'Rellenar con un bastón de queso y una loncha de jamón/tocineta.', 'Cerrar y bridar (amarrar con hilo) o usar palillos.', 'Asar.'], ing: ['Muslos de pollo', 'Queso', 'Jamón/Tocineta'], secret: 'Cerrar bien la piel para proteger la carne.', tags: ['relleno'] },
+            { module: 'bbq', category: 'otros_carnes', name: 'Cordero Rack', time: '30m', diff: 'Media', prep: ['Limpiar los huesos de las costillas (frenching).', 'Sellar a fuego alto por todos lados.', 'Terminar a fuego indirecto hasta 60°C (rosado).', 'Servir con salsa de menta.'], ing: ['Rack de cordero', 'Romero', 'Ajo', 'Aceite oliva'], secret: 'El cordero se debe comer a término medio, si se seca pierde su encanto.', tags: ['gourmet'] },
+            { module: 'bbq', category: 'otros_carnes', name: 'Pavo Ahumado', time: '3h', diff: 'Media', prep: ['Inyectar la pechuga con una mezcla de mantequilla derretida y caldo/vino.', 'Frotar la piel con mantequilla.', 'Asar a 150°C hasta que el interior marque 74°C.', 'Glasear con jarabe de arce al final.'], ing: ['Pechuga de pavo', 'Jarabe de Arce', 'Mantequilla', 'Vino blanco'], secret: 'El pavo se seca muy fácil, la inyección y el termómetro son obligatorios.', tags: ['festivo'] },
+            { module: 'bbq', category: 'pescado', name: 'Salmón Tabla Cedro', time: '20m', diff: 'Fácil', prep: ['Remojar una tabla de cedro en agua por 2 horas.', 'Poner el filete de salmón sobre la tabla.', 'Cubrir con mantequilla, limón y eneldo.', 'Poner la tabla sobre la parrilla y tapar.', 'El calor hará humear la madera perfumando el pescado.'], ing: ['Filete salmón', 'Tabla cedro', 'Mantequilla', 'Eneldo'], secret: 'El pescado no se voltea, se cocina por el vapor y humo.', tags: ['pescado'] },
+            { module: 'bbq', category: 'pescado', name: 'Trucha Limón', time: '15m', diff: 'Fácil', prep: ['Usar trucha entera abierta mariposa.', 'Rellenar con rodajas de limón y hierbas.', 'Usar una canastilla de pescado para poder voltear sin romper.', 'Asar a fuego medio hasta que la piel esté tostada.'], ing: ['Trucha', 'Limón', 'Aceite oliva', 'Perejil'], secret: 'La piel debe soltarse sola de la rejilla; si se pega, le falta cocción.', tags: ['pescado'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Papas al Plomo', time: '40m', diff: 'Fácil', prep: ['Cortar papas en rodajas o cubos.', 'Poner sobre papel aluminio con cebolla, mantequilla, sal y pimienta.', 'Cerrar el paquete herméticamente.', 'Poner directamente sobre las brasas.'], ing: ['Papas', 'Mantequilla', 'Cebolla', 'Papel aluminio'], secret: 'El vapor cocina la papa y la mantequilla la dora.', tags: ['guarnición'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Piña Asada', time: '20m', diff: 'Fácil', prep: ['Pelar la piña y cortar en rodajas gruesas o bastones.', 'Asar a fuego directo hasta que tenga marcas de parrilla.', 'Espolvorear con canela y azúcar mientras está caliente.'], ing: ['Piña oro miel', 'Canela en polvo', 'Azúcar (opcional)'], secret: 'Excelente postre de parrilla que ayuda a la digestión.', tags: ['postre'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Espárragos', time: '10m', diff: 'Fácil', prep: ['Cortar la parte dura del tallo.', 'Bañar en aceite de oliva, sal y pimienta.', 'Asar a fuego alto rápido (deben quedar al dente).', 'Terminar con queso parmesano y un chorro de limón.'], ing: ['Espárragos verdes', 'Aceite oliva', 'Parmesano', 'Limón'], secret: 'Crocantes, nunca blandos.', tags: ['vege'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Mazorca', time: '20m', diff: 'Fácil', prep: ['Asar las mazorcas primero con su propia hoja (remojada) para cocinar al vapor.', 'Luego quitar hojas y dorar los granos a fuego directo.', 'Untar mantequilla y sal.'], ing: ['Mazorca dulce', 'Mantequilla', 'Sal'], secret: 'Estilo callejero: untar mayonesa, queso rallado y chile en polvo.', tags: ['clásico'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Papas Ahumadas', time: '45m', diff: 'Fácil', prep: ['Lavar papas y pincharlas.', 'Colocarlas enteras en la rejilla superior del barril/ahumador mientras se hacen las carnes.', 'Cuando estén blandas, pelar (la piel tendrá sabor a humo).', 'Machacar con mantequilla y leche.'], ing: ['Papa pastusa', 'Mantequilla', 'Leche'], secret: 'El sabor a humo penetra y transforma un puré simple en algo extraordinario.', tags: ['guarnición'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Hasselback', time: '60m', diff: 'Media', prep: ['Lavar papas grandes.', 'Hacer cortes finos transversales sin llegar hasta abajo (usar palillos chinos a los lados como tope).', 'Insertar láminas de mantequilla o ajo entre los cortes.', 'Asar envuelta en aluminio o en bandeja.'], ing: ['Papa grande', 'Mantequilla', 'Romero/Ajo'], secret: 'Se abren como un acordeón y quedan crocantes por fuera.', tags: ['gourmet'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Yuca Frita', time: '45m', diff: 'Media', prep: ['Hervir la yuca en agua con sal hasta que abra.', 'Dejar enfriar y secar bien.', 'Cortar en bastones.', 'Freír en aceite bien caliente.'], ing: ['Yuca', 'Aceite', 'Sal'], secret: 'Si congelas la yuca cocida antes de freír, queda mucho más crocante.', tags: ['frito'] },
+            { module: 'bbq', category: 'acompanamiento', name: 'Puré Yuca', time: '30m', diff: 'Fácil', prep: ['Cocinar yuca hasta que esté muy blanda.', 'Retirar la hebra central.', 'Machacar caliente con queso crema, mantequilla y sal.'], ing: ['Yuca', 'Queso crema', 'Mantequilla'], secret: 'Tiene una textura más elástica y chiclosa que el de papa.', tags: ['cremoso'] }
         ];
-        // --- FIN: Base de Datos de Recetas (JSON) ---
 
+        // --- UTILS ---
+        const convertUnit = (text, toImperial) => {
+            if (!toImperial || typeof text !== 'string') return text;
+            return text
+                .replace(/(\d+)\s*kg/gi, (_, n) => `${(n * 2.2).toFixed(1)} lb`)
+                .replace(/(\d+)\s*g/gi, (_, n) => `${(n * 0.035).toFixed(1)} oz`)
+                .replace(/(\d+)\s*ml/gi, (_, n) => `${(n * 0.034).toFixed(1)} fl oz`)
+                .replace(/(\d+)\s*litro/gi, (_, n) => `${(n * 1.05).toFixed(1)} qt`);
+        };
 
-        // --- INICIO: Lógica de la Aplicación ---
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            // --- Declaración de variables ---
-            const tabs = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const accordionItems = document.querySelectorAll('.accordion-item');
-            
-            // Variables del Modal
-            const modal = document.getElementById('recipe-modal');
-            const modalClose = document.getElementById('modal-close');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-            const modalPrintBtn = document.getElementById('modal-print-btn');
-            // ! INICIO: Nuevas variables de Modal (Tips)
-            const modalTipsContent = document.getElementById('modal-tips-content');
-            const modalTipsText = document.getElementById('modal-tips-text');
-            // ! FIN: Nuevas variables de Modal (Tips)
+        // --- COMPONENTES ---
+        const RecipeCard = ({ recipe, onClick, isFavorite, onToggleFavorite, theme }) => (
+            <div onClick={() => onClick(recipe)} className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform transition hover:scale-[1.02] hover:shadow-lg border flex flex-col h-full relative group ${theme.border}`}>
+                <button onClick={(e) => onToggleFavorite(recipe.id, e)} className={`absolute top-2 right-2 z-20 p-2 rounded-full shadow-md transition-all ${isFavorite ? `${theme.bgSolid} text-white scale-110` : 'bg-white/90 text-gray-400 hover:text-red-500'}`}>
+                    <Icons.Heart fill={isFavorite ? "currentColor" : "none"} />
+                </button>
+                <div className={`h-32 bg-gradient-to-br ${theme.gradient} flex items-center justify-center p-4 relative`}>
+                    <div className="absolute inset-0 bg-black opacity-5 pattern-grid"></div>
+                    {recipe.module === 'jams' ? <Icons.Leaf className="text-white w-12 h-12 relative z-10 opacity-90" /> : 
+                     recipe.module === 'bbq' ? <Icons.Flame className="text-white w-12 h-12 relative z-10 opacity-90" /> :
+                     <Icons.CookingPot className="text-white w-12 h-12 relative z-10 opacity-90" />}
+                    <span className={`absolute bottom-2 right-2 bg-white/90 ${theme.text} text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide shadow-sm`}>{recipe.category.replace('_', ' ')}</span>
+                </div>
+                <div className="p-4 flex-grow flex flex-col justify-between">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-1 leading-tight line-clamp-2 font-serif">{recipe.name}</h3>
+                        <div className="flex items-center space-x-3 text-xs text-gray-500 mb-3">
+                            <span className="flex items-center"><Icons.Clock /> <span className="ml-1">{recipe.time}</span></span>
+                            <span className="flex items-center"><Icons.AlertCircle /> <span className="ml-1">{recipe.diff}</span></span>
+                        </div>
+                    </div>
+                    <button className={`w-full mt-2 py-2 rounded-lg text-sm font-bold ${theme.bgLight} ${theme.text} hover:opacity-80 transition`}>Ver Receta</button>
+                </div>
+            </div>
+        );
 
-            // Variables de Recetas (se llenarán dinámicamente)
-            let allRecipeCards = []; // Se llenará después de generar las tarjetas
-            const gridPrincipales = document.getElementById('grid-principales');
-            const gridAcompanamientos = document.getElementById('grid-acompanamientos');
-            
-            // Variables de Filtro/Búsqueda
-            const filterContainer = document.getElementById('filter-container');
-            const searchBar = document.getElementById('search-bar');
-            // ! INICIO: Nueva variable (Sort)
-            const sortSelect = document.getElementById('sort-select');
-            // ! FIN: Nueva variable (Sort)
-            const headerPrincipales = document.getElementById('header-principales');
-            const headerAcompanamientos = document.getElementById('header-acompanamientos');
-            const noResults = document.getElementById('no-results');
+        const ShoppingListModal = ({ list, onClose, onRemove, theme }) => (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl flex flex-col relative animate-slide-up" onClick={e => e.stopPropagation()}>
+              <div className={`${theme.bgSolid} text-white p-4 rounded-t-2xl flex justify-between items-center`}>
+                <h3 className="font-bold text-lg flex items-center"><Icons.ShoppingBag className="mr-2" size={20}/> Lista de Compras</h3>
+                <button onClick={onClose}><Icons.X size={20}/></button>
+              </div>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                {list.length === 0 ? <p className="text-center text-gray-500 py-4">Tu lista está vacía.</p> : (
+                  <ul className="space-y-2">
+                    {list.map((item, i) => (
+                      <li key={i} className="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100 group">
+                        <span className="text-sm text-gray-700">{typeof item === 'string' ? item : JSON.stringify(item)}</span>
+                        <button onClick={() => onRemove(i)} className="text-gray-400 hover:text-red-500 transition"><Icons.Trash2 size={16}/></button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+                <button onClick={() => { navigator.clipboard.writeText(list.join('\n')); alert('Lista copiada al portapapeles'); }} className={`w-full py-2 rounded-lg font-bold text-sm ${theme.bgLight} ${theme.text} hover:opacity-90 transition`}>Copiar Lista</button>
+              </div>
+            </div>
+          </div>
+        );
 
-            // ! INICIO: Variables de Favoritos
-            let favorites = getFavorites();
-            // ! FIN: Variables de Favoritos
+        const RecipeModal = ({ recipe, onClose, isFavorite, onToggleFavorite, theme, onAddToShoppingList }) => {
+          const [portions, setPortions] = useState(1);
+          const [checked, setChecked] = useState({});
+          const [imperial, setImperial] = useState(false);
+          const [cookingMode, setCookingMode] = useState(false);
+          const [timer, setTimer] = useState(null);
+          const wakeLock = useRef(null);
 
-            // Mapa de iconos
-            const iconMap = {
-                cerdo: '🐖',
-                res: '🐄',
-                pollo: '🐓',
-                cordero: '🐑',
-                pavo: '🦃',
-                pescado: '🐟',
-                acompanamiento: '🥗'
+          useEffect(() => { setPortions(1); setChecked({}); setImperial(false); setTimer(null); }, [recipe]);
+
+          const toggleCookingMode = async () => {
+            if (!cookingMode) {
+                try { if ('wakeLock' in navigator) wakeLock.current = await navigator.wakeLock.request('screen'); setCookingMode(true); } catch (err) { setCookingMode(true); }
+            } else {
+                if (wakeLock.current) await wakeLock.current.release(); setCookingMode(false);
+            }
+          };
+
+          useEffect(() => {
+            let interval = null;
+            if (timer > 0) interval = setInterval(() => setTimer(t => t - 1), 1000);
+            else if (timer === 0) { alert("¡Tiempo terminado!"); setTimer(null); }
+            return () => clearInterval(interval);
+          }, [timer]);
+
+          const startTimer = (text) => {
+              const match = text.match(/(\d+)\s*min/);
+              if(match) setTimer(parseInt(match[1]) * 60);
+          };
+
+          const formatTime = (s) => `${Math.floor(s / 60)}:${(s % 60 < 10 ? '0' : '')}${s % 60}`;
+
+          if (!recipe) return null;
+
+          const renderIng = (text) => {
+            let processedText = convertUnit(text, imperial);
+            const match = processedText.match(/^([\d.]+)(\D.*)$/);
+            if (match) {
+              const val = parseFloat(match[1]);
+              if (!isNaN(val)) {
+                const newVal = (val * portions).toFixed(1).replace('.0','');
+                return `${newVal}${match[2]}`;
+              }
+            }
+            return processedText;
+          };
+
+          const modalClass = cookingMode ? "fixed inset-0 z-[100] bg-white overflow-y-auto" : "bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] shadow-2xl flex flex-col relative animate-slide-up";
+          const containerClass = cookingMode ? "" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm";
+
+          return (
+            <div className={containerClass} onClick={(e) => !cookingMode && onClose()}>
+              <div className={modalClass} onClick={e => e.stopPropagation()}>
+                <div className={`${theme.bgSolid} text-white p-6 relative flex-shrink-0 flex justify-between items-start`}>
+                    <div>
+                        <span className="text-xs font-bold uppercase tracking-wider opacity-80 mb-1 block">{MODULES[recipe.module].categories.find(c => c.id === recipe.category)?.name}</span>
+                        <h2 className={`${cookingMode ? 'text-5xl' : 'text-3xl'} font-serif font-bold leading-tight`}>{recipe.name}</h2>
+                    </div>
+                    <div className="flex space-x-2">
+                         <button onClick={toggleCookingMode} className="p-2 bg-white/20 hover:bg-white/40 rounded-full transition">{cookingMode ? <Icons.Minimize /> : <Icons.Maximize />}</button>
+                        <button onClick={onClose} className="p-2 bg-white/20 hover:bg-white/40 rounded-full transition"><Icons.X /></button>
+                    </div>
+                </div>
+                <div className={`flex-1 overflow-y-auto ${cookingMode ? 'p-8' : 'p-6'} space-y-8`}>
+                  {!cookingMode && (
+                    <div className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span className="flex items-center"><Icons.Clock size={16} className="mr-1"/> {recipe.time}</span>
+                            <span className="flex items-center"><Icons.AlertCircle size={16} className="mr-1"/> {recipe.diff}</span>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <button onClick={() => setImperial(!imperial)} className="flex items-center text-xs font-bold text-gray-500 hover:text-gray-800"><Icons.Scale size={14} className="mr-1"/> {imperial ? 'Imperial' : 'Métrico'}</button>
+                            <div className="flex items-center bg-white rounded-md border shadow-sm">
+                                <button onClick={() => setPortions(Math.max(0.5, portions-0.5))} className="p-1 hover:bg-gray-100"><Icons.Minus size={14}/></button>
+                                <span className="px-3 text-sm font-bold w-12 text-center">{portions}x</span>
+                                <button onClick={() => setPortions(portions+0.5)} className="p-1 hover:bg-gray-100"><Icons.Plus size={14}/></button>
+                            </div>
+                        </div>
+                    </div>
+                  )}
+                  {timer !== null && (
+                      <div className="sticky top-4 z-50 bg-black/80 text-white px-6 py-3 rounded-full shadow-xl flex items-center justify-between mx-auto w-max backdrop-blur">
+                          <Icons.Clock className="mr-3 animate-pulse" />
+                          <span className="font-mono text-2xl font-bold ml-3 mr-4">{formatTime(timer)}</span>
+                          <button onClick={() => setTimer(null)}><Icons.X /></button>
+                      </div>
+                  )}
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                       <h3 className={`font-bold text-xl flex items-center ${theme.text}`}><Icons.Menu size={20} className="mr-2"/> Ingredientes</h3>
+                       {!cookingMode && (
+                        <button onClick={() => {
+                            const itemsToAdd = recipe.ing.filter((_, i) => checked[i]).map(ing => renderIng(ing));
+                            if(itemsToAdd.length > 0) onAddToShoppingList(itemsToAdd);
+                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full text-gray-600 flex items-center transition font-medium"><Icons.ShoppingBag size={14} className="mr-1"/> Añadir marcados</button>
+                       )}
+                    </div>
+                    <ul className={`grid ${cookingMode ? 'grid-cols-1 text-xl' : 'grid-cols-1 sm:grid-cols-2 text-sm'} gap-3`}>
+                      {recipe.ing.map((item, i) => (
+                        <li key={i} className={`flex items-start p-2 rounded-lg transition ${checked[i] ? 'bg-green-50 opacity-60' : 'hover:bg-gray-50'} cursor-pointer select-none`} onClick={() => setChecked({...checked, [i]: !checked[i]})}>
+                          <div className={`mt-0.5 mr-3 ${checked[i] ? 'text-green-500' : 'text-gray-300'}`}>{checked[i] ? <Icons.CheckSquare size={cookingMode ? 24 : 18}/> : <Icons.Square size={cookingMode ? 24 : 18}/>}</div>
+                          <span className={`${checked[i] ? 'line-through opacity-60' : 'text-gray-700'}`}>{renderIng(item)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className={`font-bold text-xl mb-4 flex items-center ${theme.text}`}><Icons.BookOpen size={20} className="mr-2"/> Preparación</h3>
+                    <ol className="space-y-6">
+                    {recipe.prep.map((step, i) => (
+                        <li key={i} className="flex group">
+                        <span className={`flex-shrink-0 ${cookingMode ? 'w-10 h-10 text-lg' : 'w-7 h-7 text-xs'} rounded-full ${theme.bgLight} ${theme.text} font-bold flex items-center justify-center mr-4 mt-0.5 border ${theme.borderLight}`}>{i+1}</span>
+                        <span className={`${cookingMode ? 'text-xl leading-relaxed' : 'text-gray-700 leading-relaxed'} cursor-pointer hover:text-blue-600 transition-colors`} onClick={() => startTimer(step)} title="Haz clic si ves un tiempo para iniciar temporizador">{step}</span>
+                        </li>
+                    ))}
+                    </ol>
+                  </div>
+                  <div className={`p-5 rounded-xl border-l-4 ${theme.bgLight} ${theme.border}`}>
+                    <h4 className={`font-bold text-sm mb-2 ${theme.text} flex items-center uppercase tracking-wide`}><Icons.Star size={16} className="mr-2"/> Secreto del Chef</h4>
+                    <p className={`${cookingMode ? 'text-lg' : 'text-sm'} text-gray-700 italic`}>"{recipe.secret}"</p>
+                  </div>
+                </div>
+                {!cookingMode && (
+                    <div className="p-4 border-t border-gray-100 flex justify-between bg-gray-50 rounded-b-2xl">
+                    <button onClick={() => onToggleFavorite(recipe.id)} className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition ${isFavorite ? 'text-red-500 bg-red-50 ring-1 ring-red-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'}`}>
+                        <Icons.Heart size={16} fill={isFavorite ? "currentColor" : "none"} /> <span className="ml-2">{isFavorite ? 'Guardado' : 'Guardar'}</span>
+                    </button>
+                    <div className="flex space-x-2">
+                        <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-white hover:shadow-sm rounded-lg transition" onClick={() => window.print()} title="Imprimir"><Icons.Printer size={18}/></button>
+                        <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-white hover:shadow-sm rounded-lg transition" title="Compartir"><Icons.Share2 size={18}/></button>
+                    </div>
+                    </div>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        const App = () => {
+            const [module, setModule] = useState('jams');
+            const [category, setCategory] = useState('all');
+            const [search, setSearch] = useState('');
+            const [selected, setSelected] = useState(null);
+            const [favorites, setFavorites] = useState([]);
+            const [shopList, setShopList] = useState([]);
+            const [showList, setShowList] = useState(false);
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+            useEffect(() => {
+                try {
+                    const f = JSON.parse(localStorage.getItem('ryf_favs') || '[]');
+                    const l = JSON.parse(localStorage.getItem('ryf_list') || '[]');
+                    if(Array.isArray(f)) setFavorites(f);
+                    if(Array.isArray(l)) setShopList(l.map(i => typeof i === 'string' ? i : JSON.stringify(i)));
+                } catch(e) {}
+            }, []);
+
+            const toggleFav = (id, e) => {
+                e?.stopPropagation();
+                const newFavs = favorites.includes(id) ? favorites.filter(x => x !== id) : [...favorites, id];
+                setFavorites(newFavs);
+                localStorage.setItem('ryf_favs', JSON.stringify(newFavs));
             };
 
-            // --- Funcionalidad de Pestañas (Tabs) ---
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    tab.classList.add('active');
-                    const activeTabContent = document.getElementById(tab.dataset.tab + '-content');
-                    if (activeTabContent) activeTabContent.classList.add('active');
-                });
-            });
+            const addToList = (items) => {
+                const newList = [...shopList, ...items];
+                setShopList(newList);
+                localStorage.setItem('ryf_list', JSON.stringify(newList));
+                alert('Añadido a la lista');
+            };
 
-            // --- Funcionalidad de Acordeón ---
-            accordionItems.forEach(item => {
-                const header = item.querySelector('.accordion-header');
-                const content = item.querySelector('.accordion-content');
-                const icon = header.querySelector('span:last-child');
+            const removeFromList = (index) => {
+                const newList = shopList.filter((_, i) => i !== index);
+                setShopList(newList);
+                localStorage.setItem('ryf_list', JSON.stringify(newList));
+            };
 
-                header.addEventListener('click', () => {
-                    const isOpen = content.style.maxHeight;
-                    if (isOpen) {
-                        content.style.maxHeight = null;
-                        if (icon) icon.textContent = '+';
-                    } else {
-                        if (content) content.style.maxHeight = content.scrollHeight + 'px';
-                        if (icon) icon.textContent = '−';
-                    }
-                });
-            });
+            const mod = MODULES[module];
+            const filtered = useMemo(() => FULL_RECIPES.filter(r => {
+                if (r.module !== module && category !== 'favorites') return false;
+                if (category === 'favorites') return favorites.includes(r.name);
+                if (category !== 'all' && r.category !== category) return false;
+                if (search && !r.name.toLowerCase().includes(search.toLowerCase())) return false;
+                return true;
+            }).map(r => ({...r, id: r.name})), [module, category, search, favorites]);
 
-            // --- ! INICIO: Generación Dinámica de Recetas (Actualizada) ---
-            function generateRecipeCards() {
-                if (!gridPrincipales || !gridAcompanamientos) return;
-
-                // ! Actualizar favoritos desde localStorage al inicio
-                favorites = getFavorites();
-
-                let gridPrincipalesHTML = '';
-                let gridAcompanamientosHTML = '';
-
-                recipeData.forEach(recipe => {
-                    const icon = iconMap[recipe.category] || '🍽️';
-                    // ! Comprobar si es favorito
-                    const isFavorite = favorites.includes(recipe.id);
-                    
-                    const cardHTML = `
-                        <div class="recipe-card rounded-lg shadow-md overflow-hidden" 
-                             data-recipe-id="${recipe.id}" 
-                             data-category="${recipe.category}"
-                             data-time-minutes="${recipe.timeMinutes}"
-                             data-difficulty-value="${recipe.difficultyValue}"
-                             data-title="${recipe.title.toLowerCase()}"
-                        >
-                            <div class="recipe-card-image-container">
-                                <img src="${recipe.image}" alt="${recipe.title}" class="w-full h-40 object-cover">
-                                <!-- ! Botón de Favorito -->
-                                <span class="favorite-btn ${isFavorite ? 'active' : ''}" data-fav-id="${recipe.id}">❤️</span>
+            return (
+                <div className="min-h-screen flex flex-col">
+                    <nav className="bg-white shadow-sm sticky top-0 z-40">
+                        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                            <div className="flex items-center">
+                                <button className="lg:hidden p-2 -ml-2 text-gray-600 mr-2" onClick={() => setIsMenuOpen(!isMenuOpen)}><Icons.Menu /></button>
+                                <h1 className="font-serif font-bold text-xl md:text-2xl text-gray-800">Raíces y Fogones</h1>
+                                <span className="mx-3 text-gray-300 hidden md:inline">|</span>
+                                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest hidden md:block">Colombia</span>
                             </div>
-                            <div class="p-4">
-                                <h3 class="text-lg font-bold">${icon} ${recipe.title}</h3>
+                            <div className="hidden lg:flex bg-gray-100 p-1 rounded-xl mx-4">
+                                {Object.values(MODULES).map(m => (
+                                    <button key={m.id} onClick={() => { setModule(m.id); setCategory('all'); }} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all ${module === m.id ? 'bg-white shadow-sm ' + m.theme.text : 'text-gray-500 hover:text-gray-700'}`}>
+                                        <m.icon size={16} className="mr-2" /> {m.title}
+                                    </button>
+                                ))}
                             </div>
-                            <div class="card-details">
-                                <span><strong>Tiempo:</strong> ${recipe.time}</span>
-                                <span><strong>Dificultad:</strong> ${recipe.difficulty}</span>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setShowList(true)} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 relative">
+                                    <Icons.ShoppingBag size={20} />
+                                    {shopList.length > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
+                                </button>
+                                <button onClick={() => setCategory(category === 'favorites' ? 'all' : 'favorites')} className={`p-2 rounded-full transition ${category === 'favorites' ? 'bg-red-100 text-red-500' : 'text-gray-600 hover:bg-gray-100'}`}>
+                                    <Icons.Heart fill={category === 'favorites' ? "currentColor" : "none"} size={20} />
+                                </button>
                             </div>
                         </div>
-                    `;
-                    
-                    if (recipe.category === 'acompanamiento') {
-                        gridAcompanamientosHTML += cardHTML;
-                    } else {
-                        gridPrincipalesHTML += cardHTML;
-                    }
-                });
+                        {/* Mobile Tabs */}
+                        <div className="md:hidden flex overflow-x-auto p-2 gap-2 border-t border-gray-100">
+                             {Object.values(MODULES).map(m => (
+                                <button key={m.id} onClick={() => { setModule(m.id); setCategory('all'); }} className={`flex-shrink-0 flex items-center px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${module === m.id ? m.theme.bgLight + ' ' + m.theme.text : 'bg-gray-50 text-gray-500'}`}>
+                                    <m.icon size={18} className="mr-3" /> {m.title}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
 
-                gridPrincipales.innerHTML = gridPrincipalesHTML;
-                gridAcompanamientos.innerHTML = gridAcompanamientosHTML;
+                    <main className="flex-1 container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-8">
+                        <aside className="lg:w-72 flex-shrink-0 space-y-6">
+                            <div className={`p-6 rounded-3xl ${mod.theme.bgLight} border ${mod.theme.borderLight} text-center relative overflow-hidden`}>
+                                <div className={`absolute top-0 left-0 w-full h-1 ${mod.theme.bgSolid}`}></div>
+                                <div className={`mx-auto mb-3 opacity-90 ${mod.theme.text} w-14 h-14 flex items-center justify-center`}><mod.icon size={56}/></div>
+                                <h2 className={`font-serif font-bold text-2xl mt-2 mb-1 ${mod.theme.text}`}>{mod.title}</h2>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest mb-6 font-semibold">{mod.subtitle}</p>
+                                <div className="text-sm text-gray-600 text-left space-y-3">
+                                    {mod.guide.map((g, i) => (
+                                        <div key={i} className="bg-white/80 p-3 rounded-xl border border-white/50 shadow-sm">
+                                            <span className={`font-bold block text-xs mb-1 ${mod.theme.text}`}>{g.title}</span>
+                                            <span className="text-xs leading-relaxed opacity-90 whitespace-pre-line">{g.content}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-3 hidden lg:block">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-2 mb-1">Recetario</h3>
+                                <div className="space-y-1 max-h-[50vh] overflow-y-auto custom-scrollbar pr-1">
+                                    {mod.categories.map(cat => (
+                                        <button key={cat.id} onClick={() => setCategory(cat.id)} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all flex justify-between items-center ${category === cat.id ? `${mod.theme.bgSolid} text-white shadow-md` : 'text-gray-600 hover:bg-gray-50'}`}>
+                                            <span className="font-medium">{cat.name}</span>
+                                            {category === cat.id && <Icons.ArrowRight size={14}/>}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </aside>
 
-                // ! IMPORTANTE: Seleccionar las tarjetas DESPUÉS de generarlas
-                allRecipeCards = document.querySelectorAll('.recipe-card');
-                
-                // Añadir listeners a las nuevas tarjetas
-                allRecipeCards.forEach(card => {
-                    // Listener para abrir el modal (en la tarjeta)
-                    card.addEventListener('click', (e) => {
-                        // Solo abrir modal si no se hizo clic en el botón de favorito
-                        if (e.target.closest('.favorite-btn')) return;
-                        const recipeId = card.dataset.recipeId;
-                        openModal(recipeId);
-                    });
-                });
-
-                // ! Añadir listeners a los botones de favorito
-                document.querySelectorAll('.favorite-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Evitar que se abra el modal
-                        toggleFavorite(e.target);
-                    });
-                });
-            }
-            // --- ! FIN: Generación Dinámica de Recetas ---
-
-
-            // --- ! INICIO: Funcionalidad del Modal de Recetas (Actualizada) ---
-            function openModal(recipeId) {
-                const recipe = recipeData.find(r => r.id === recipeId);
-                
-                if (recipe && modalTitle && modalBody && modal) {
-                    modalTitle.textContent = recipe.title;
-                    
-                    // ! INICIO: Construcción dinámica de contenido
-                    let modalHTML = '';
-
-                    // 1. Ingredientes
-                    if (recipe.ingredients && recipe.ingredients.length > 0) {
-                        modalHTML += '<h3 class="font-bold text-xl mb-3">Ingredientes:</h3>';
-                        modalHTML += '<ul class="list-disc pl-5 mb-4 space-y-1">';
-                        
-                        let sublistOpen = false;
-                        recipe.ingredients.forEach(ing => {
-                            const itemText = `${ing.amount ? `<strong>${ing.amount}</strong> ` : ''}${ing.unit ? `${ing.unit} ` : ''}${ing.name}`;
+                        <div className="flex-1">
+                            <div className="mb-6 relative">
+                                <div className="absolute left-3 top-3 text-gray-400"><Icons.Search size={18} /></div>
+                                <input type="text" placeholder="Buscar receta..." className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{'--tw-ring-color': mod.theme.text}} value={search} onChange={e => setSearch(e.target.value)}/>
+                            </div>
                             
-                            if (ing.isSubheader) {
-                                if (sublistOpen) modalHTML += '</ul></li>'; // Cierra sublista anterior si existe
-                                modalHTML += `<li>${itemText}<ul class="list-disc pl-6 mt-1">`; // Abre nueva sublista
-                                sublistOpen = true;
-                            } else if (ing.isSubItem) {
-                                modalHTML += `<li>${itemText}</li>`; // Item dentro de sublista
-                            } else {
-                                if (sublistOpen) modalHTML += '</ul></li>'; // Cierra sublista anterior
-                                modalHTML += `<li>${itemText}</li>`; // Item normal
-                                sublistOpen = false;
-                            }
-                        });
-                        if (sublistOpen) modalHTML += '</ul></li>'; // Cierra la última sublista
-                        modalHTML += '</ul>';
-                    }
+                            <div className="mb-6 flex items-end justify-between border-b border-gray-100 pb-4">
+                                <div>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Explorando</span>
+                                    <h2 className="text-3xl font-serif font-bold text-gray-800 leading-none mt-1">
+                                        {category === 'favorites' ? 'Mis Favoritos' : category === 'all' ? 'Recetario Completo' : mod.categories.find(c => c.id === category)?.name}
+                                    </h2>
+                                </div>
+                                <span className="text-sm font-medium bg-gray-100 px-3 py-1 rounded-full text-gray-600">{filtered.length} recetas</span>
+                            </div>
 
-                    // 2. Instrucciones
-                    if (recipe.instructions && recipe.instructions.length > 0) {
-                        modalHTML += '<h3 class="font-bold text-xl mb-3">Instrucciones:</h3>';
-                        modalHTML += '<ol class="list-decimal pl-5 space-y-2">';
-                        recipe.instructions.forEach(step => {
-                            modalHTML += `<li>${step}</li>`;
-                        });
-                        modalHTML += '</ol>';
-                    }
-                    
-                    modalBody.innerHTML = modalHTML;
-                    // ! FIN: Construcción dinámica de contenido
-                    
-                    // ! Lógica de Tips
-                    if (recipe.tips && modalTipsContent && modalTipsText) {
-                        modalTipsText.textContent = recipe.tips;
-                        modalTipsContent.classList.remove('hidden');
-                    } else {
-                        modalTipsContent.classList.add('hidden');
-                    }
+                            {filtered.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {filtered.map((recipe) => (
+                                        <RecipeCard key={recipe.id} recipe={recipe} theme={mod.theme} onClick={setSelected} isFavorite={favorites.includes(recipe.id)} onToggleFavorite={(id, e) => toggleFav(id, e)} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-24 bg-white rounded-[2rem] border-2 border-dashed border-gray-100">
+                                    <div className={`w-20 h-20 mx-auto ${mod.theme.bgLight} rounded-full flex items-center justify-center mb-4 text-gray-400`}>
+                                        <Icons.ChefHat size={40} className={mod.theme.text} />
+                                    </div>
+                                    <p className="text-gray-400 font-medium">No encontramos recetas.</p>
+                                    <button onClick={() => {setSearch(''); setCategory('all');}} className={`mt-4 px-6 py-2 rounded-full font-bold text-sm ${mod.theme.bgSolid} text-white`}>Ver todo</button>
+                                </div>
+                            )}
+                        </div>
+                    </main>
 
-                    modal.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
-                }
-            }
+                    <footer className="bg-white border-t border-gray-200 mt-12 py-8">
+                        <div className="container mx-auto px-4 text-center">
+                            <div className="flex justify-center items-center mb-4 opacity-50">
+                                <Icons.ChefHat className="mr-2" />
+                                <span className="font-serif font-bold text-xl">Raíces y Fogones</span>
+                            </div>
+                            <p className="text-gray-500 text-sm mb-2">
+                                Enciclopedia gastronómica digital
+                            </p>
+                            <div className="w-16 h-1 bg-gray-200 mx-auto my-4 rounded-full"></div>
+                            <p className="text-gray-600 text-sm font-medium">
+                                Desarrollado por <br/>
+                                <span className="text-lg text-gray-800 font-bold">Juan Miguel Rios Redondo</span>
+                            </p>
+                            <p className="text-gray-400 text-xs mt-4">© {new Date().getFullYear()} Colombia</p>
+                        </div>
+                    </footer>
 
-            function closeModal() {
-                if (modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
-            }
+                    <RecipeModal recipe={selected} onClose={() => setSelected(null)} isFavorite={selected && favorites.includes(selected.id)} onToggleFavorite={(id) => toggleFav(id)} theme={mod.theme} onAddToShoppingList={addToList} />
+                    {showList && <ShoppingListModal list={shopList} onClose={() => setShowList(false)} onRemove={removeFromList} theme={mod.theme} />}
+                </div>
+            );
+        };
 
-            // Clicks para cerrar el modal
-            if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-            if (modalClose) modalClose.addEventListener('click', closeModal);
-            // --- ! FIN: Funcionalidad del Modal de Recetas ---
-
-
-            // --- ! INICIO: Funcionalidad de Filtro y Búsqueda combinada (Actualizada) ---
-            function updateRecipeView() {
-                if (!filterContainer || !searchBar || !allRecipeCards.length || !sortSelect) return;
-
-                const activeFilter = filterContainer.querySelector('.filter-button.active').dataset.filter;
-                const searchTerm = searchBar.value.toLowerCase();
-                const sortValue = sortSelect.value;
-                
-                let mainVisibleCards = [];
-                let accompVisibleCards = [];
-
-                allRecipeCards.forEach(card => {
-                    const category = card.dataset.category;
-                    const title = card.dataset.title;
-                    const recipeId = card.dataset.recipeId;
-                    
-                    // ! Lógica de Filtro (con Favoritos)
-                    const isFavorite = favorites.includes(recipeId);
-                    const matchesFilter = (activeFilter === 'todos') || 
-                                          (activeFilter === category) || 
-                                          (activeFilter === 'favoritos' && isFavorite);
-                    const matchesSearch = title.includes(searchTerm);
-
-                    if (matchesFilter && matchesSearch) {
-                        card.style.display = 'block';
-                        if (category === 'acompanamiento') {
-                            accompVisibleCards.push(card);
-                        } else {
-                            mainVisibleCards.push(card);
-                        }
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                // ! Lógica de Ordenamiento
-                const sortFunction = (a, b) => {
-                    const valA = a.dataset;
-                    const valB = b.dataset;
-
-                    switch (sortValue) {
-                        case 'time-asc':
-                            return parseFloat(valA.timeMinutes) - parseFloat(valB.timeMinutes);
-                        case 'time-desc':
-                            return parseFloat(valB.timeMinutes) - parseFloat(valA.timeMinutes);
-                        case 'difficulty-asc':
-                            return parseFloat(valA.difficultyValue) - parseFloat(valB.difficultyValue);
-                        case 'difficulty-desc':
-                            return parseFloat(valB.difficultyValue) - parseFloat(valA.difficultyValue);
-                        case 'name-asc':
-                            return valA.title.localeCompare(valB.title);
-                        case 'name-desc':
-                            return valB.title.localeCompare(valA.title);
-                        case 'default':
-                        default:
-                            return 0; // Mantener el orden del DOM
-                    }
-                };
-                
-                if (sortValue !== 'default') {
-                    mainVisibleCards.sort(sortFunction);
-                    accompVisibleCards.sort(sortFunction);
-                }
-
-                // ! Re-apendar al DOM en el orden correcto
-                mainVisibleCards.forEach(card => gridPrincipales.appendChild(card));
-                accompVisibleCards.forEach(card => gridAcompanamientos.appendChild(card));
-
-                // Actualizar visibilidad de cabeceras
-                if (headerPrincipales) headerPrincipales.style.display = (mainVisibleCards.length > 0) ? 'block' : 'none';
-                if (headerAcompanamientos) headerAcompanamientos.style.display = (accompVisibleCards.length > 0) ? 'block' : 'none';
-
-                // Mostrar mensaje de no resultados
-                if (noResults) {
-                    noResults.style.display = (mainVisibleCards.length === 0 && accompVisibleCards.length === 0) ? 'block' : 'none';
-                }
-            }
-
-            // Event Listeners para Filtro y Búsqueda
-            if (filterContainer) {
-                filterContainer.addEventListener('click', (event) => {
-                    if (event.target.classList.contains('filter-button')) {
-                        filterContainer.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
-                        event.target.classList.add('active');
-                        updateRecipeView();
-                    }
-                });
-            }
-            if (searchBar) searchBar.addEventListener('keyup', updateRecipeView);
-            // ! Listener para Ordenar
-            if (sortSelect) sortSelect.addEventListener('change', updateRecipeView);
-            // --- ! FIN: Funcionalidad de Filtro y Búsqueda ---
-            
-
-            // --- ! INICIO: Funciones de Favoritos (Nuevas) ---
-            function getFavorites() {
-                const favs = localStorage.getItem('asadosBarrilFavorites');
-                return favs ? JSON.parse(favs) : [];
-            }
-
-            function saveFavorites(favs) {
-                localStorage.setItem('asadosBarrilFavorites', JSON.stringify(favs));
-            }
-
-            function toggleFavorite(btnElement) {
-                const recipeId = btnElement.dataset.favId;
-                const index = favorites.indexOf(recipeId);
-
-                if (index > -1) {
-                    // Ya es favorito, quitar
-                    favorites.splice(index, 1);
-                    btnElement.classList.remove('active');
-                } else {
-                    // No es favorito, añadir
-                    favorites.push(recipeId);
-                    btnElement.classList.add('active');
-                }
-                saveFavorites(favorites);
-
-                // Si estamos en la vista de favoritos, actualizar la vista
-                const activeFilter = filterContainer.querySelector('.filter-button.active').dataset.filter;
-                if (activeFilter === 'favoritos') {
-                    updateRecipeView();
-                }
-            }
-            // --- ! FIN: Funciones de Favoritos ---
-
-
-            // --- ! INICIO: Funcionalidad de Imprimir ---
-            function handlePrint() {
-                const title = modalTitle.textContent;
-                // ! Actualizado para incluir los Tips
-                const content = document.getElementById('modal-body-printable').innerHTML;
-                
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write('<html><head><title>Imprimir Receta</title>');
-                // Estilos simples para impresión
-                printWindow.document.write(`
-                    <style>
-                        body { font-family: 'Inter', sans-serif; line-height: 1.6; margin: 2rem; }
-                        h1 { color: #d97706; }
-                        h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-                        ul, ol { padding-left: 20px; }
-                        /* Ocultar elementos no deseados en impresión */
-                        #modal-tips-content.hidden { display: none; }
-                        #modal-tips-content {
-                            background-color: #fafaf8;
-                            border-left: 4px solid #d97706;
-                            padding: 16px;
-                            border-radius: 8px;
-                            margin-top: 16px;
-                        }
-                    </style>
-                `);
-                printWindow.document.write('</head><body>');
-                printWindow.document.write(`<h1>${title}</h1>`);
-                printWindow.document.write(content);
-                printWindow.document.write('</body></html>');
-                
-                printWindow.document.close();
-                printWindow.focus();
-                
-                // Esperar a que el contenido se cargue antes de imprimir
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.close();
-                }, 250);
-            }
-
-            if (modalPrintBtn) modalPrintBtn.addEventListener('click', handlePrint);
-            // --- ! FIN: Funcionalidad de Imprimir ---
-
-
-            // --- INICIO: Ejecución Inicial ---
-            generateRecipeCards();
-            updateRecipeView(); // Para ocultar cabeceras si están vacías al inicio (aunque no debería pasar)
-
-        });
-        // --- FIN: Lógica de la Aplicación ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
